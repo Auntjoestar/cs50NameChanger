@@ -1,0 +1,13 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "cs50NameChanger",
+  "outputfilename": "cs50NameChanger",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "auntjoestar",
+    "email": "88282065+Auntjoestar@users.noreply.github.com"
+  }
+}
