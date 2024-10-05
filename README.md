@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # README
 
 ## About
@@ -17,3 +18,7 @@ to this in your browser, and you can call your Go code from devtools.
 ## Building
 
 To build a redistributable, production mode package, use `wails build`.
+=======
+# cs50NameChanger-
+Golang rework of C# version
+>>>>>>> 398b6fb73e49a65a375e6a382cbafd9e5bc461fa
