@@ -10,20 +10,24 @@ export function ConnectDB() {
   return window['go']['main']['App']['ConnectDB']();
 }
 
-export function ListCycles() {
-  return window['go']['main']['App']['ListCycles']();
+export function CreateDB() {
+  return window['go']['main']['App']['CreateDB']();
 }
 
-export function ListGroups() {
-  return window['go']['main']['App']['ListGroups']();
+export function ListCycles(arg1) {
+  return window['go']['main']['App']['ListCycles'](arg1);
+}
+
+export function ListGroups(arg1) {
+  return window['go']['main']['App']['ListGroups'](arg1);
 }
 
 export function ListPrograms() {
   return window['go']['main']['App']['ListPrograms']();
 }
 
-export function ListWeeks() {
-  return window['go']['main']['App']['ListWeeks']();
+export function ListWeeks(arg1) {
+  return window['go']['main']['App']['ListWeeks'](arg1);
 }
 
 export function MakeNewName(arg1, arg2, arg3, arg4) {

@@ -6,13 +6,15 @@ export function ChangeFileNames(arg1:Array<string>,arg2:string):Promise<void>;
 
 export function ConnectDB():Promise<gorm.DB>;
 
-export function ListCycles():Promise<Array<string>>;
+export function CreateDB():Promise<void>;
 
-export function ListGroups():Promise<Array<string>>;
+export function ListCycles(arg1:string):Promise<Array<string>>;
+
+export function ListGroups(arg1:string):Promise<Array<string>>;
 
 export function ListPrograms():Promise<Array<string>>;
 
-export function ListWeeks():Promise<Array<string>>;
+export function ListWeeks(arg1:string):Promise<Array<string>>;
 
 export function MakeNewName(arg1:string,arg2:string,arg3:string,arg4:string):Promise<string>;
 

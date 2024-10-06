@@ -35,8 +35,26 @@ func (a *App) ConnectDB() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	db.AutoMigrate(&models.Program{}, &models.Cycle{}, &models.Week{}, &models.Group{})
+	err = db.AutoMigrate(
+		&models.Program{}, &models.Cycle{}, &models.Week{}, &models.Group{},
+		&models.ProgramsResponse{}, &models.CyclesResponse{}, &models.WeeksResponse{},
+		&models.GroupsResponse{})
+	if err != nil {
+		return nil, err
+	}
 	return db, nil
+}
+
+func (a *App) CreateDB() error {
+	db, err := a.ConnectDB()
+	if err != nil {
+		return err
+	}
+	db.AutoMigrate(
+		&models.Program{}, &models.Cycle{}, &models.Week{}, &models.Group{},
+		&models.ProgramsResponse{}, &models.CyclesResponse{}, &models.WeeksResponse{},
+		&models.GroupsResponse{})
+	return nil
 }
 
 func (a *App) ListPrograms() []string {
@@ -44,56 +62,65 @@ func (a *App) ListPrograms() []string {
 	if err != nil {
 		return nil
 	}
-	var programs []models.Program
+	var programs []models.ProgramsResponse
 	db.Find(&programs)
 	var programNames []string
 	for _, program := range programs {
 		programNames = append(programNames, program.Name)
 	}
 	if len(programNames) == 0 {
-		return nil
+		return []string{"No hay programas"}
 	}
 	return programNames
 }
 
-func (a *App) ListCycles() []string {
+func (a *App) ListCycles(program string) []string {
 	db, err := a.ConnectDB()
 	if err != nil {
 		return nil
 	}
-	var cycles []models.Cycle
-	db.Find(&cycles)
+	var cycles []models.CyclesResponse
+	db.Find(&cycles, "program_id = ?", program)
 	var cycleNames []string
 	for _, cycle := range cycles {
 		cycleNames = append(cycleNames, cycle.Name)
 	}
+	if len(cycleNames) == 0 {
+		return []string{"No hay ciclos"}
+	}
 	return cycleNames
 }
 
-func (a *App) ListWeeks() []string {
+func (a *App) ListWeeks(cycle string) []string {
 	db, err := a.ConnectDB()
 	if err != nil {
 		return nil
 	}
-	var weeks []models.Week
-	db.Find(&weeks)
+	var weeks []models.WeeksResponse
+	db.Find(&weeks, "cycle_id = ?", cycle)
 	var weekNames []string
 	for _, week := range weeks {
 		weekNames = append(weekNames, week.Name)
 	}
+	if len(weekNames) == 0 {
+		return []string{"No hay semanas"}
+	}
 	return weekNames
 }
 
-func (a *App) ListGroups() []string {
+func (a *App) ListGroups(cycle string) []string {
 	db, err := a.ConnectDB()
 	if err != nil {
 		return nil
 	}
-	var groups []models.Group
-	db.Find(&groups)
+	var groups []models.GroupsResponse
+	db.Find(&groups, "cycle_id = ?", cycle)
 	var groupNames []string
 	for _, group := range groups {
 		groupNames = append(groupNames, group.Name)
+	}
+	if len(groupNames) == 0 {
+		return []string{"No hay grupos"}
 	}
 	return groupNames
 }

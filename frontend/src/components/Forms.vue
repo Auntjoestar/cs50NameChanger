@@ -1,7 +1,9 @@
 <script setup>
 import { ref, reactive } from 'vue';
-import { ListPrograms, ListCycles, ListWeeks, ListGroups, MakeNewName, OpenFileDialog, ChangeFileNames } from '../../wailsjs/go/main/App';
+import { CreateDB, ListPrograms, ListCycles, ListWeeks, ListGroups, MakeNewName, OpenFileDialog, ChangeFileNames } from '../../wailsjs/go/main/App';
 
+const connected = ref(false);
+const contentLoaded = ref(false);
 const programs = ref([]);
 const cycles = ref([]);
 const weeks = ref([]);
@@ -18,18 +20,69 @@ const newFilesName = reactive({
     files: [],
 });
 
+async function connect() {
+    try {
+        await CreateDB();
+        await initializeForms();
+        connected.value = true;
+        message.value = "Conexión exitosa";
+    } catch (error) {
+        message.value = `Error al conectar con la base de datos: ${error}`;
+    }
+}
+
+async function listCycles() {
+    try {
+        if (programs.value == "") {
+            cycles.value = ["Selecciona un programa"];
+            return;
+        }
+        const result = await ListCycles(newFilesName.program);
+        cycles.value = result;
+    } catch (error) {
+        message.value = `Error al cargar los ciclos: ${error}`;
+    }
+}
+
+async function listWeeks() {
+    try {
+        if (cycles.value == "") {
+            weeks.value = ["Selecciona un ciclo"];
+            return;
+        }
+        const result = await ListWeeks(newFilesName.cycle);
+        weeks.value = result;
+    } catch (error) {
+        message.value = `Error al cargar las semanas: ${error}`;
+    }
+}
+
+async function listGroups() {
+    try {
+        if (weeks.value == "") {
+            groups.value = ["Selecciona un ciclo"];
+            return;
+        }
+        const result = await ListGroups(newFilesName.cycle);
+        groups.value = result;
+    } catch (error) {
+        message.value = `Error al cargar los grupos: ${error}`;
+    }
+}
+
 async function initializeForms() {
     try {
-
-        const [programsData, cyclesData, weeksData, groupsData] = await Promise.all([
-            ListPrograms(),
-            ListCycles(),
-            ListWeeks(),
-            ListGroups()]);
-        programs.value = programsData;
-        cycles.value = cyclesData;
-        weeks.value = weeksData;
-        groups.value = groupsData;
+        const result = await ListPrograms();
+        programs.value = result;
+        console.log(programs.value.at(0));
+        if (programs.value.at(0) === "No hay programas") {
+            cycles.value = ["No hay ciclos"];
+            weeks.value = ["No hay semanas"];
+            groups.value = ["No hay grupos"];
+        }
+        if (!contentLoaded.value) {
+            contentLoaded.value = true;
+        }
     } catch (error) {
         message.value = `Error al cargar los datos: ${error.message}`;
     }
@@ -89,7 +142,18 @@ initializeForms();
 </script>
 
 <template>
-    <main>
+    <main v-if="!connected">
+        <div class="message">
+            <p>Al parecer no estás conectado a la base de datos, por favor, conectate para continuar</p>
+        </div>
+        <div class="message">
+            <p>{{ message }}</p>
+        </div>
+        <button @click="connect">Conectar con la base de datos</button>
+    </main>
+    <button @click="initializeForms" v-if="connected" v-show="!contentLoaded">Cargar datos</button>
+    <button @click="initializeForms" v-if="connected && contentLoaded">Recargar datos</button>
+    <main v-if="connected && contentLoaded">
         <div class="message">
             <p>{{ message }}</p>
         </div>
@@ -97,7 +161,7 @@ initializeForms();
             <div class="input-box">
                 <label for="programs-options">Escoge el programa: </label>
                 <select id="programs-options" autocomplete="off" class="input" type="text"
-                    v-model="newFilesName.program" @change="makeNewName">
+                    v-model="newFilesName.program" @change="makeNewName && listCycles">
                     <option value="" disabled selected v-if="programs.length == 0">Cargando programas...</option>
                     <option value="" disabled selected v-else>Selecciona un programa</option>
                     <option v-for="(program, index) in programs" :key="index">
