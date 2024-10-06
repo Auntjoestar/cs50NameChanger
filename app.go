@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"./models"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	// sqlite ORM
-	// "gorm.io/gorm"
-	// "gorm.io/driver/sqlite"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 // App struct
@@ -29,9 +29,13 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) ListPrograms() []string {
-	programs := []string{"cs50", "web50", "CodeKids"}
-	return programs
+func (a *App) ConnectDB() (*gorm.DB, error) {
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	db.AutoMigrate(&models.Program{}, &models.Cycle{}, &models.Week{}, &models.Group{})
+	return db, nil
 }
 
 func (a *App) ListCycles() []string {
