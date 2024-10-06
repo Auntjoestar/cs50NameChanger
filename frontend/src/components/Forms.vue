@@ -98,7 +98,8 @@ initializeForms();
                 <label for="programs-options">Escoge el programa: </label>
                 <select id="programs-options" autocomplete="off" class="input" type="text"
                     v-model="newFilesName.program" @change="makeNewName">
-                    <option value="" disabled selected>Selecciona un programa</option>
+                    <option value="" disabled selected v-if="programs.length == 0">Cargando programas...</option>
+                    <option value="" disabled selected v-else>Selecciona un programa</option>
                     <option v-for="(program, index) in programs" :key="index">
                         {{ program }}
                     </option>
@@ -109,7 +110,8 @@ initializeForms();
                 <label for="cycles-options">Escoge el ciclo: </label>
                 <select id="cycles-options" autocomplete="off" class="input" type="text" v-model="newFilesName.cycle"
                     @change="makeNewName">
-                    <option value="" disabled selected>Selecciona un ciclo</option>
+                    <option value="" disabled selected v-if="cycles.length == 0">Cargando ciclos...</option>
+                    <option value="" disabled selected v-else>Selecciona un ciclo</option>
                     <option v-for="(cycle, index) in cycles" :key="index">
                         {{ cycle }}
                     </option>
@@ -120,7 +122,8 @@ initializeForms();
                 <label for="weeks-options">Escoge la semana: </label>
                 <select id="weeks-options" autocomplete="off" class="input" type="text" v-model="newFilesName.week"
                     @change="makeNewName">
-                    <option value="" disabled selected>Selecciona una semana</option>
+                    <option value="" disabled selected v-if="weeks.length == 0">Cargando semanas...</option>
+                    <option value="" disabled selected v-else>Selecciona una semana</option>
                     <option v-for="(week, index) in weeks" :key="index">
                         {{ week }}
                     </option>
@@ -131,7 +134,8 @@ initializeForms();
                 <label for="groups-options">Escoge el grupo: </label>
                 <select id="groups-options" autocomplete="off" class="input" type="text" v-model="newFilesName.group"
                     @change="makeNewName">
-                    <option value="" disabled selected>Selecciona un grupo</option>
+                    <option value="" disabled selected v-if="groups.length == 0">Cargando grupos...</option>
+                    <option value="" disabled selected v-else>Selecciona un grupo</option>
                     <option v-for="(group, index) in groups" :key="index">
                         {{ group }}
                     </option>

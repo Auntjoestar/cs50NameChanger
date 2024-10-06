@@ -7,7 +7,8 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"./models"
+	"cs50NameChanger/models"
+
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -38,19 +39,63 @@ func (a *App) ConnectDB() (*gorm.DB, error) {
 	return db, nil
 }
 
+func (a *App) ListPrograms() []string {
+	db, err := a.ConnectDB()
+	if err != nil {
+		return nil
+	}
+	var programs []models.Program
+	db.Find(&programs)
+	var programNames []string
+	for _, program := range programs {
+		programNames = append(programNames, program.Name)
+	}
+	if len(programNames) == 0 {
+		return nil
+	}
+	return programNames
+}
+
 func (a *App) ListCycles() []string {
-	cycles := []string{"Y24C1", "Y24C2", "Y24C3"}
-	return cycles
+	db, err := a.ConnectDB()
+	if err != nil {
+		return nil
+	}
+	var cycles []models.Cycle
+	db.Find(&cycles)
+	var cycleNames []string
+	for _, cycle := range cycles {
+		cycleNames = append(cycleNames, cycle.Name)
+	}
+	return cycleNames
 }
 
 func (a *App) ListWeeks() []string {
-	weeks := []string{"S01", "S02", "S03"}
-	return weeks
+	db, err := a.ConnectDB()
+	if err != nil {
+		return nil
+	}
+	var weeks []models.Week
+	db.Find(&weeks)
+	var weekNames []string
+	for _, week := range weeks {
+		weekNames = append(weekNames, week.Name)
+	}
+	return weekNames
 }
 
 func (a *App) ListGroups() []string {
-	groups := []string{"A", "B", "C"}
-	return groups
+	db, err := a.ConnectDB()
+	if err != nil {
+		return nil
+	}
+	var groups []models.Group
+	db.Find(&groups)
+	var groupNames []string
+	for _, group := range groups {
+		groupNames = append(groupNames, group.Name)
+	}
+	return groupNames
 }
 
 func (a *App) MakeNewName(program string, cycle string, week string, group string) string {

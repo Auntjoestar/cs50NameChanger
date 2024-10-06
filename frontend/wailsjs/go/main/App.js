@@ -6,6 +6,10 @@ export function ChangeFileNames(arg1, arg2) {
   return window['go']['main']['App']['ChangeFileNames'](arg1, arg2);
 }
 
+export function ConnectDB() {
+  return window['go']['main']['App']['ConnectDB']();
+}
+
 export function ListCycles() {
   return window['go']['main']['App']['ListCycles']();
 }
