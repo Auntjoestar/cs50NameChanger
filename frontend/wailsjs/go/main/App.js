@@ -6,10 +6,6 @@ export function ChangeFileNames(arg1, arg2) {
   return window['go']['main']['App']['ChangeFileNames'](arg1, arg2);
 }
 
-export function Greet(arg1) {
-  return window['go']['main']['App']['Greet'](arg1);
-}
-
 export function ListCycles() {
   return window['go']['main']['App']['ListCycles']();
 }

@@ -3,8 +3,6 @@
 
 export function ChangeFileNames(arg1:Array<string>,arg2:string):Promise<void>;
 
-export function Greet(arg1:string):Promise<string>;
-
 export function ListCycles():Promise<Array<string>>;
 
 export function ListGroups():Promise<Array<string>>;

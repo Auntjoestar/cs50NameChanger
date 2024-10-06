@@ -29,12 +29,6 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	names := [2]string{"Mario", "Luis"}
-	return fmt.Sprintf("Hello %s, It's show time!", names[1])
-}
-
 func (a *App) ListPrograms() []string {
 	programs := []string{"cs50", "web50", "CodeKids"}
 	return programs
@@ -83,15 +77,5 @@ func (a *App) ChangeFileNames(files []string, newName string) error {
 			return err
 		}
 	}
-	/*
-		for _, file := range files {
-			dir, filename := filepath.Split(file)
-			newFile := filepath.Join(dir, newName+filepath.Ext(filename))
-			err := os.Rename(file, newFile)
-			if err != nil {
-				return err
-			}
-		}
-	*/
 	return nil
 }

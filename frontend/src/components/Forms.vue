@@ -7,6 +7,7 @@ const cycles = ref([]);
 const weeks = ref([]);
 const groups = ref([]);
 const message = ref("");
+const tableVisibility = ref(false);
 
 const newFilesName = reactive({
     name: "",
@@ -17,35 +18,40 @@ const newFilesName = reactive({
     files: [],
 });
 
-async function listPrograms() {
-    const result = await ListPrograms();
-    programs.value = result;
-}
+async function initializeForms() {
+    try {
 
-async function listCycles() {
-    const result = await ListCycles();
-    cycles.value = result;
-}
-
-async function listWeeks() {
-    const result = await ListWeeks();
-    weeks.value = result;
-}
-
-async function listGroups() {
-    const result = await ListGroups();
-    groups.value = result;
+        const [programsData, cyclesData, weeksData, groupsData] = await Promise.all([
+            ListPrograms(),
+            ListCycles(),
+            ListWeeks(),
+            ListGroups()]);
+        programs.value = programsData;
+        cycles.value = cyclesData;
+        weeks.value = weeksData;
+        groups.value = groupsData;
+    } catch (error) {
+        message.value = `Error al cargar los datos: ${error.message}`;
+    }
 }
 
 async function selectFiles() {
     try {
         const result = await OpenFileDialog();
-        newFilesName.files= result;
+        newFilesName.files = result;
     } catch (error) {
         message.value = error;
     }
 }
 
+async function addFiles() {
+    try {
+        const result = await OpenFileDialog();
+        newFilesName.files = [...newFilesName.files, ...result];
+    } catch (error) {
+        message.value = error;
+    }
+}
 
 function makeNewName() {
     MakeNewName(newFilesName.program, newFilesName.cycle, newFilesName.week, newFilesName.group)
@@ -58,16 +64,28 @@ function changeFileNames() {
     ChangeFileNames(newFilesName.files, newFilesName.name)
         .then(result => {
             message.value = result;
+            for (let key in newFilesName) {
+                if (key != 'files') {
+                    newFilesName[key] = "";
+                    continue;
+                }
+                newFilesName[key] = [];
+            }
         })
         .catch(error => {
             message.value = error;
         });
 }
 
-listPrograms();
-listCycles();
-listWeeks();
-listGroups();
+function toggleTableVisibility() {
+    tableVisibility.value = !tableVisibility.value;
+}
+
+function unselectFile(file) {
+    newFilesName.files = newFilesName.files.filter(f => f != file);
+}
+
+initializeForms();
 </script>
 
 <template>
@@ -129,19 +147,27 @@ listGroups();
                 <label for="select-files">Selecciona las imagenes: </label>
                 <button id="select-files" @click="selectFiles"><i class="fa-regular fa-image"></i></button>
 
-                <div class="table" v-if="newFilesName.files.length > 0">
+                <button @click="toggleTableVisibility" v-if="newFilesName.files.length > 0">Mostrar archivos
+                    seleccionados</button>
+                <div class="table" v-if="newFilesName.files.length > 0" v-show="tableVisibility">
                     <h3>Archivos seleccionados:</h3>
+                    <div class="table-actions">
+                        <button @click="newFilesName.files = []">Limpiar</button>
+                        <button @click="addFiles">Agregar</button>
+                    </div>
                     <table>
                         <thead>
                             <tr>
                                 <th>Índice</th>
                                 <th>Nombre</th>
+                                <th>Acción</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="(file, index) in newFilesName.files" :key="index">
                                 <td>{{ index + 1 }}</td>
                                 <td>{{ file }}</td>
+                                <td><button @click="unselectFile(file)">Eliminar</button></td>
                             </tr>
                         </tbody>
                     </table>
@@ -153,7 +179,8 @@ listGroups();
                     "Nombre del archivo" porque la función MakeNewName retorna la previa cadena cuando no se han seleccionado dato 
                      en todos los formularios
                  -->
-                <button @click="changeFileNames" v-if="newFilesName.files.length > 0 && newFilesName.name != '' && newFilesName.name != 'Nombre del archivo'">Cambiar
+                <button @click="changeFileNames"
+                    v-if="newFilesName.files.length > 0 && newFilesName.name != '' && newFilesName.name != 'Nombre del archivo'">Cambiar
                     nombres</button>
             </div>
         </div>
@@ -161,6 +188,10 @@ listGroups();
 </template>
 
 <style lang="scss">
+body {
+    background-color: #f2f2f2;
+}
+
 main {
     margin: auto;
     width: 90%;
@@ -176,6 +207,10 @@ td {
     border: 1px solid black;
     padding: 8px;
     text-align: left;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
 }
 
 .table {
