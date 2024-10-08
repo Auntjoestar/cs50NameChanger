@@ -31,7 +31,7 @@ func (a *App) startup(ctx context.Context) {
 }
 
 func (a *App) ConnectDB() (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("cs50x.db"), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (a *App) ListCycles(program string) []string {
 		return nil
 	}
 	var cycles []models.CyclesResponse
-	db.Find(&cycles, "program_id = ?", program)
+	db.Joins("Program").Find(&cycles, "program.name = ?", program)
 	var cycleNames []string
 	for _, cycle := range cycles {
 		cycleNames = append(cycleNames, cycle.Name)
@@ -97,7 +97,7 @@ func (a *App) ListWeeks(cycle string) []string {
 		return nil
 	}
 	var weeks []models.WeeksResponse
-	db.Find(&weeks, "cycle_id = ?", cycle)
+	db.Joins("Cycle").Find(&weeks, "cycle.name = ?", cycle)
 	var weekNames []string
 	for _, week := range weeks {
 		weekNames = append(weekNames, week.Name)
@@ -114,7 +114,7 @@ func (a *App) ListGroups(cycle string) []string {
 		return nil
 	}
 	var groups []models.GroupsResponse
-	db.Find(&groups, "cycle_id = ?", cycle)
+	db.Joins("Cycle").Find(&groups, "cycle.name = ?", cycle)
 	var groupNames []string
 	for _, group := range groups {
 		groupNames = append(groupNames, group.Name)
@@ -123,6 +123,83 @@ func (a *App) ListGroups(cycle string) []string {
 		return []string{"No hay grupos"}
 	}
 	return groupNames
+}
+
+func (a *App) CreateProgram(name string) error {
+	db, err := a.ConnectDB()
+	if err != nil {
+		return err
+	}
+	program := models.Program{Name: name}
+	err = db.Create(&program).Error
+	if err != nil {
+		return err
+	}
+	db.Create(&models.ProgramsResponse{
+		ID:   program.ID,
+		Name: program.Name,
+	})
+	return nil
+}
+
+func (a *App) CreateCycle(name string, program string) error {
+	db, err := a.ConnectDB()
+	if err != nil {
+		return err
+	}
+	var programDB models.Program
+	db.First(&programDB, "name = ?", program)
+	cycle := models.Cycle{Name: name, ProgramID: programDB.ID}
+	err = db.Create(&cycle).Error
+	if err != nil {
+		return err
+	}
+	db.Create(&models.CyclesResponse{
+		ID:        cycle.ID,
+		Name:      cycle.Name,
+		ProgramID: cycle.ProgramID,
+	})
+	return nil
+}
+
+func (a *App) CreateWeek(name string, cycle string) error {
+	db, err := a.ConnectDB()
+	if err != nil {
+		return err
+	}
+	var cycleDB models.Cycle
+	db.First(&cycleDB, "name = ?", cycle)
+	week := models.Week{Name: name, CycleID: cycleDB.ID}
+	err = db.Create(&week).Error
+	if err != nil {
+		return err
+	}
+	db.Create(&models.WeeksResponse{
+		ID:      week.ID,
+		Name:    week.Name,
+		CycleID: week.CycleID,
+	})
+	return nil
+}
+
+func (a *App) CreateGroup(name string, cycle string) error {
+	db, err := a.ConnectDB()
+	if err != nil {
+		return err
+	}
+	var cycleDB models.Cycle
+	db.First(&cycleDB, "name = ?", cycle)
+	group := models.Group{Name: name, CycleID: cycleDB.ID}
+	err = db.Create(&group).Error
+	if err != nil {
+		return err
+	}
+	db.Create(&models.GroupsResponse{
+		ID:      group.ID,
+		Name:    group.Name,
+		CycleID: group.CycleID,
+	})
+	return nil
 }
 
 func (a *App) MakeNewName(program string, cycle string, week string, group string) string {

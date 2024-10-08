@@ -1,6 +1,15 @@
 <script setup>
 import { ref, reactive } from 'vue';
-import { CreateDB, ListPrograms, ListCycles, ListWeeks, ListGroups, MakeNewName, OpenFileDialog, ChangeFileNames } from '../../wailsjs/go/main/App';
+import {
+    CreateDB,
+    ListPrograms,
+    ListCycles,
+    ListWeeks,
+    ListGroups,
+    MakeNewName,
+    OpenFileDialog,
+    ChangeFileNames
+} from '../../wailsjs/go/main/App';
 
 const connected = ref(false);
 const contentLoaded = ref(false);
@@ -38,6 +47,10 @@ async function listCycles() {
             return;
         }
         const result = await ListCycles(newFilesName.program);
+        if (result[0] === "No hay ciclos") {
+            cycles.value = ["No hay ciclos"];
+            return;
+        }
         cycles.value = result;
     } catch (error) {
         message.value = `Error al cargar los ciclos: ${error}`;
@@ -50,7 +63,12 @@ async function listWeeks() {
             weeks.value = ["Selecciona un ciclo"];
             return;
         }
+        console.log(newFilesName.cycle)
         const result = await ListWeeks(newFilesName.cycle);
+        if (result[0] === "No hay semanas") {
+            weeks.value = ["No hay semanas"];
+            return;
+        }
         weeks.value = result;
     } catch (error) {
         message.value = `Error al cargar las semanas: ${error}`;
@@ -59,11 +77,15 @@ async function listWeeks() {
 
 async function listGroups() {
     try {
-        if (weeks.value == "") {
+        if (cycles.value == "") {
             groups.value = ["Selecciona un ciclo"];
             return;
         }
         const result = await ListGroups(newFilesName.cycle);
+        if (result[0] === "No hay grupos") {
+            groups.value = ["No hay grupos"];
+            return;
+        }
         groups.value = result;
     } catch (error) {
         message.value = `Error al cargar los grupos: ${error}`;
@@ -74,7 +96,6 @@ async function initializeForms() {
     try {
         const result = await ListPrograms();
         programs.value = result;
-        console.log(programs.value.at(0));
         if (programs.value.at(0) === "No hay programas") {
             cycles.value = ["No hay ciclos"];
             weeks.value = ["No hay semanas"];
@@ -142,27 +163,30 @@ initializeForms();
 </script>
 
 <template>
-    <main v-if="!connected">
+    <header>
+        <h1>Bienvenido a CS50 Name Changer</h1>
+        <p>El programa de <strong>cs50x.ni</strong> para renombrar las imagenes según el formato oficial.</p>
         <div class="message">
-            <p>Al parecer no estás conectado a la base de datos, por favor, conectate para continuar</p>
+            <p>Al parecer no estás conectado a la base de datos, por favor, conectate para continuar.</p>
         </div>
         <div class="message">
             <p>{{ message }}</p>
         </div>
+    </header>
+    <main v-if="!connected">
         <button @click="connect">Conectar con la base de datos</button>
     </main>
     <button @click="initializeForms" v-if="connected" v-show="!contentLoaded">Cargar datos</button>
     <button @click="initializeForms" v-if="connected && contentLoaded">Recargar datos</button>
     <main v-if="connected && contentLoaded">
-        <div class="message">
-            <p>{{ message }}</p>
-        </div>
         <div class="choices">
             <div class="input-box">
                 <label for="programs-options">Escoge el programa: </label>
                 <select id="programs-options" autocomplete="off" class="input" type="text"
-                    v-model="newFilesName.program" @change="makeNewName && listCycles">
+                    v-model="newFilesName.program" @change="(event) => { listCycles(); makeNewName(); }">
                     <option value="" disabled selected v-if="programs.length == 0">Cargando programas...</option>
+                    <option value="" disabled selected v-if="programs[0] == 'No hay programas'">No hay programas
+                    </option>
                     <option value="" disabled selected v-else>Selecciona un programa</option>
                     <option v-for="(program, index) in programs" :key="index">
                         {{ program }}
@@ -172,9 +196,11 @@ initializeForms();
 
             <div class="input-box">
                 <label for="cycles-options">Escoge el ciclo: </label>
-                <select id="cycles-options" autocomplete="off" class="input" type="text" v-model="newFilesName.cycle"
-                    @change="makeNewName">
+                <select id="cycles-options" autocomplete="off" class="input" type="text" 
+                v-model="newFilesName.cycle"
+                    @change="(event) => { listWeeks(); listGroups(); makeNewName(); }">
                     <option value="" disabled selected v-if="cycles.length == 0">Cargando ciclos...</option>
+                    <option value="" disabled selected v-if="cycles[0] == 'No hay ciclos'">No hay ciclos</option>
                     <option value="" disabled selected v-else>Selecciona un ciclo</option>
                     <option v-for="(cycle, index) in cycles" :key="index">
                         {{ cycle }}
@@ -184,8 +210,8 @@ initializeForms();
 
             <div class="input-box">
                 <label for="weeks-options">Escoge la semana: </label>
-                <select id="weeks-options" autocomplete="off" class="input" type="text" v-model="newFilesName.week"
-                    @change="makeNewName">
+                <select id="weeks-options" autocomplete="off" class="input" type="text" 
+                v-model="newFilesName.week" @change="makeNewName">
                     <option value="" disabled selected v-if="weeks.length == 0">Cargando semanas...</option>
                     <option value="" disabled selected v-else>Selecciona una semana</option>
                     <option v-for="(week, index) in weeks" :key="index">
@@ -207,8 +233,8 @@ initializeForms();
             </div>
 
             <div class="input-box">
-                <input id="new-files-name" :value="newFilesName.name" autocomplete="off" class="input" type="text"
-                    placeholder="Nombre del archivo" disabled />
+                <input id="new-files-name" :value="newFilesName.name" autocomplete="off" 
+                class="input" type="text" placeholder="Nombre del archivo" disabled />
             </div>
 
             <div class="input-box">
@@ -248,8 +274,8 @@ initializeForms();
                      en todos los formularios
                  -->
                 <button @click="changeFileNames"
-                    v-if="newFilesName.files.length > 0 && newFilesName.name != '' && newFilesName.name != 'Nombre del archivo'">Cambiar
-                    nombres</button>
+                    v-if="newFilesName.files.length > 0 && newFilesName.name != '' 
+                    && newFilesName.name != 'Nombre del archivo'">Cambiar nombres</button>
             </div>
         </div>
     </main>

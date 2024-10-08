@@ -6,7 +6,15 @@ export function ChangeFileNames(arg1:Array<string>,arg2:string):Promise<void>;
 
 export function ConnectDB():Promise<gorm.DB>;
 
+export function CreateCycle(arg1:string,arg2:string):Promise<void>;
+
 export function CreateDB():Promise<void>;
+
+export function CreateGroup(arg1:string,arg2:string):Promise<void>;
+
+export function CreateProgram(arg1:string):Promise<void>;
+
+export function CreateWeek(arg1:string,arg2:string):Promise<void>;
 
 export function ListCycles(arg1:string):Promise<Array<string>>;
 

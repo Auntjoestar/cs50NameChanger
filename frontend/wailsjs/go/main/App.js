@@ -10,8 +10,24 @@ export function ConnectDB() {
   return window['go']['main']['App']['ConnectDB']();
 }
 
+export function CreateCycle(arg1, arg2) {
+  return window['go']['main']['App']['CreateCycle'](arg1, arg2);
+}
+
 export function CreateDB() {
   return window['go']['main']['App']['CreateDB']();
+}
+
+export function CreateGroup(arg1, arg2) {
+  return window['go']['main']['App']['CreateGroup'](arg1, arg2);
+}
+
+export function CreateProgram(arg1) {
+  return window['go']['main']['App']['CreateProgram'](arg1);
+}
+
+export function CreateWeek(arg1, arg2) {
+  return window['go']['main']['App']['CreateWeek'](arg1, arg2);
 }
 
 export function ListCycles(arg1) {
