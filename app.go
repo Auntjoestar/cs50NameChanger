@@ -232,3 +232,78 @@ func (a *App) ChangeFileNames(files []string, newName string) error {
 	}
 	return nil
 }
+
+func (a *App) WatchPrograms() models.ProgramsResponse {
+	db, err := a.ConnectDB()
+	if err != nil {
+		return models.ProgramsResponse{}
+	}
+	var programs []models.Program
+	db.Find(&programs)
+	if len(programs) == 0 {
+		return models.ProgramsResponse{}
+	}
+	var programsResponse models.ProgramsResponse
+	for _, program := range programs {
+		programsResponse.ID = program.ID
+		programsResponse.Name = program.Name
+	}
+	return programsResponse
+}
+
+func (a *App) WatchCycles() models.CyclesResponse {
+	db, err := a.ConnectDB()
+	if err != nil {
+		return models.CyclesResponse{}
+	}
+	var cycles []models.Cycle
+	db.Find(&cycles)
+	if len(cycles) == 0 {
+		return models.CyclesResponse{}
+	}
+	var cyclesResponse models.CyclesResponse
+	for _, cycle := range cycles {
+		cyclesResponse.ID = cycle.ID
+		cyclesResponse.Name = cycle.Name
+		cyclesResponse.ProgramID = cycle.ProgramID
+	}
+	return cyclesResponse
+}
+
+func (a *App) WatchWeeks() models.WeeksResponse {
+	db, err := a.ConnectDB()
+	if err != nil {
+		return models.WeeksResponse{}
+	}
+	var weeks []models.Week
+	db.Find(&weeks)
+	if len(weeks) == 0 {
+		return models.WeeksResponse{}
+	}
+	var weeksResponse models.WeeksResponse
+	for _, week := range weeks {
+		weeksResponse.ID = week.ID
+		weeksResponse.Name = week.Name
+		weeksResponse.CycleID = week.CycleID
+	}
+	return weeksResponse
+}
+
+func (a *App) WatchGroups() models.GroupsResponse {
+	db, err := a.ConnectDB()
+	if err != nil {
+		return models.GroupsResponse{}
+	}
+	var groups []models.Group
+	db.Find(&groups)
+	if len(groups) == 0 {
+		return models.GroupsResponse{}
+	}
+	var groupsResponse models.GroupsResponse
+	for _, group := range groups {
+		groupsResponse.ID = group.ID
+		groupsResponse.Name = group.Name
+		groupsResponse.CycleID = group.CycleID
+	}
+	return groupsResponse
+}

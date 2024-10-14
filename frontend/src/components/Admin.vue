@@ -1,132 +1,210 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import {
-    CreateProgram,
-    ListPrograms,
-    CreateCycle,
-    ListCycles,
-    CreateWeek,
-    CreateGroup
+    WatchPrograms,
+    WatchCycles,
+    WatchWeeks,
+    WatchGroups,
 } from '../../wailsjs/go/main/App';
+import ProgramForm from './createProgramForm.vue';
+import CycleForm from './createCycleForm.vue';
+import WeekForm from './createWeekForm.vue';
+import GroupForm from './createGroupForm.vue';
 
-const program = ref("");
-const programs = ref([]);
-
-const cycle = ref({
-    name: "",
-    program: "",
-})
-const cycles = ref([]);
-
-const week = ref({
-    name: "",
-    cycle: "",
+const creatView = reactive({
+    program: true,
+    cycle: false,
+    week: false,
+    group: false,
 })
 
-const group = ref({
-    name: "",
-    cycle: "",
-})
+const programs = ref([])
+const cycles = ref([])
+const weeks = ref([])
+const groups = ref([])
 
-async function createProgram() {
-    await CreateProgram(program.value.toLocaleLowerCase());
-    program.value = "";
-}
-
-async function listPrograms() {
-    const response = await ListPrograms();
-    programs.value = response;
-}
-
-async function listCycles() {
-    const response = await ListCycles(cycle.value.program);
-    if (response[0] === "No hay ciclos") {
-        cycles.value = ["No hay ciclos"];
+async function watchPrograms() {
+    programs.value.push(await WatchPrograms());
+    if (programs.id=== 0) {
+        console.log("No hay programas disponibles")
         return;
     }
-    cycles.value = response;
+    console.log(programs.value);
 }
 
-async function createCycle() {
-    await CreateCycle(cycle.value.name.toLocaleLowerCase(), cycle.value.program);
-    cycle.value = {
-        name: "",
-        program: "",
+async function watchCycles() {
+    cycles.value.push(await WatchCycles());
+    if (cycles.id === 0) {
+        console.log("No hay ciclos disponibles")
+        return;
     }
+    console.log(cycles.value);
 }
 
-async function createWeek() {
-    await CreateWeek(week.value.name.toLocaleLowerCase(), week.value.cycle);
-    week.value = {
-        name: "",
-        cycle: "",
+async function watchWeeks() {
+    weeks.value.push(await WatchWeeks());
+    if (weeks.id === 0) {
+        console.log("No hay semanas disponibles")
+        return;
     }
+    console.log(weeks.value);
 }
 
-async function createGroup() {
-    await CreateGroup(group.value.name.toLocaleLowerCase(), group.value.cycle);
-    group.value = {
-        name: "",
-        cycle: "",
+async function watchGroups() {
+    groups.value.push(await WatchGroups());
+    if (groups.id === 0) {
+        console.log("No hay grupos disponibles")
+        return;
     }
+    console.log(groups.value);
 }
 
-listPrograms();
+watchPrograms();
+watchCycles();
+watchWeeks();
+watchGroups();
 </script>
 
 <template>
     <header>
-        <h1>Panel de administración</h1>
-        <nav>
-            <ul>
-            </ul>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Panel de administración</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Ver</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Crear
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item"
+                                        @click="creatView.program = true; creatView.cycle = false; creatView.week = false; creatView.group = false;">Programa
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                        @click="creatView.program = false; creatView.cycle = true; creatView.week = false; creatView.group = false;">Ciclo
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                        @click="creatView.program = false; creatView.cycle = false; creatView.week = true; creatView.group = false;">Semana
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                        @click="creatView.program = false; creatView.cycle = false; creatView.week = false; creatView.group = true;">Grupo
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </nav>
     </header>
     <main>
-        <section>
-            <h2>Crear</h2>
-            <form>
-                <input type="text" v-model="program" placeholder="Programa" />
-                <button type="button" @click="createProgram">Crear</button>
-            </form>
-        </section>
-        <section>
-            <form>
-                <input type="text" v-model="cycle.name" placeholder="Ciclo" />
-                <select v-model="cycle.program" type="text" placeholder="Programa">
-                    <option value="">Selecciona un programa</option>
-                    <option v-for="(program, index) in programs" :key="index">{{ program }}</option>
-                </select>
-                <button type="button" @click="createCycle">Crear</button>
-            </form>
-        </section>
-        <section>
-            <form>
-                <input type="text" v-model="week.name" placeholder="Semana" />
-                <select v-model="cycle.program" type="text" placeholder="Programa" @change="listCycles">
-                    <option value="">Selecciona un programa</option>
-                    <option v-for="(program, index) in programs" :key="index">{{ program }}</option>
-                </select>
-                <select v-model="week.cycle" type="text" placeholder="Ciclo">
-                    <option value="">Selecciona un ciclo</option>
-                    <option v-for="(cycle, index) in cycles" :key="index">{{ cycle }}</option>
-                </select>
-                <button type="button" @click="createWeek">Crear</button>
-            </form>
-        </section>
-        <section>
-            <form>
-                <input type="text" v-model="group.name" placeholder="Grupo" />
-                <select v-model="cycle.program" type="text" placeholder="Programa" @change="listCycles">
-                    <option value="">Selecciona un programa</option>
-                    <option v-for="(program, index) in programs" :key="index">{{ program }}</option>
-                </select>
-                <select v-model="group.cycle" type="text" placeholder="Ciclo">
-                    <option value="">Selecciona un ciclo</option>
-                    <option v-for="(cycle, index) in cycles" :key="index">{{ cycle }}</option>
-                </select>
-                <button type="button" @click="createGroup">Crear</button>
-            </form>
-        </section>
+        <ProgramForm v-if="creatView.program" />
+
+        <CycleForm v-if="creatView.cycle" />
+
+        <WeekForm v-if="creatView.week" />
+
+        <GroupForm v-if="creatView.group" />
+
+        <table v-if="programs[0].id !== 0">
+            <thead>
+                <tr>
+                    <th>ID</th> 
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(program, index) in programs" :key="index">
+                    <td>{{ program.id }}</td>
+                    <td>{{ program.name }}</td>
+                    <td>
+                        <button class="btn btn-danger">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table v-if="cycles[0].id !== 0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Programa</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(cycle, index) in cycles" :key="index">
+                    <td>{{ cycle.id }}</td>
+                    <td>{{ cycle.name }}</td>
+                    <td>{{ cycle.program_id }}</td>
+                    <td>
+                        <button class="btn btn-danger">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p v-else>No hay ciclos</p>
+
+        <table v-if="weeks[0].id !== 0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Ciclo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(week, index) in weeks" :key="index">
+                    <td>{{ week.id }}</td>
+                    <td>{{ week.name }}</td>
+                    <td>{{ week.cycle_id }}</td>
+                    <td>
+                        <button class="btn btn-danger">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p v-else>No hay semanas</p>
+
+        <table v-if="groups[0].id !== 0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Ciclo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(group, index) in groups" :key="index">
+                    <td>{{ group.id }}</td>
+                    <td>{{ group.name }}</td>
+                    <td>{{ group.cicle_id }}</td>
+                    <td>
+                        <button class="btn btn-danger">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p v-else>No hay grupos</p>
     </main>
 </template>
+

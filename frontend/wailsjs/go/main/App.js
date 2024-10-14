@@ -53,3 +53,19 @@ export function MakeNewName(arg1, arg2, arg3, arg4) {
 export function OpenFileDialog() {
   return window['go']['main']['App']['OpenFileDialog']();
 }
+
+export function WatchCycles() {
+  return window['go']['main']['App']['WatchCycles']();
+}
+
+export function WatchGroups() {
+  return window['go']['main']['App']['WatchGroups']();
+}
+
+export function WatchPrograms() {
+  return window['go']['main']['App']['WatchPrograms']();
+}
+
+export function WatchWeeks() {
+  return window['go']['main']['App']['WatchWeeks']();
+}
