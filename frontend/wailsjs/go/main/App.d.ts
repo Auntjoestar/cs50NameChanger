@@ -29,10 +29,10 @@ export function MakeNewName(arg1:string,arg2:string,arg3:string,arg4:string):Pro
 
 export function OpenFileDialog():Promise<Array<string>>;
 
-export function WatchCycles():Promise<models.CyclesResponse>;
+export function WatchCycles():Promise<Array<models.CyclesResponse>>;
 
-export function WatchGroups():Promise<models.GroupsResponse>;
+export function WatchGroups():Promise<Array<models.GroupsResponse>>;
 
-export function WatchPrograms():Promise<models.ProgramsResponse>;
+export function WatchPrograms():Promise<Array<models.ProgramsResponse>>;
 
-export function WatchWeeks():Promise<models.WeeksResponse>;
+export function WatchWeeks():Promise<Array<models.WeeksResponse>>;

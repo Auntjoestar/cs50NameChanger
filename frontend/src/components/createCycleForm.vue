@@ -16,7 +16,7 @@ async function listPrograms() {
 }
 
 async function createCycle() {
-    await CreateCycle(cycle.value.name.toLowerCase(), cycle.value.program);
+    await CreateCycle(cycle.value.name, cycle.value.program);
     cycle.value = {
         name: "",
         program: "",

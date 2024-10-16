@@ -25,7 +25,7 @@ async function listCycles() {
 }
 
 async function createWeek() {
-    await CreateWeek(week.value.name.toLowerCase(), week.value.cycle);
+    await CreateWeek(week.value.name, week.value.cycle);
     week.value = {
         name: "",
         cycle: "",

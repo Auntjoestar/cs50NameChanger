@@ -1,0 +1,14 @@
+☐ @low Escoge el número de foto en que empezar
+☐ @high Si los selectores están vacios, no permitir el envío
+☐ @low Crear una carpeta con el regex de las fotos dónde se guardarán las fotos
+☐ @low Abrir la úbicación de las fotos
+☐ @low Crear tabla colapsable para las fotos seleccionadas
+☐ @high Añadir Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub al README.md
+☐ @low Añadir clases de booststrap en los mensajes
+☐ @low Añadir mensajes de éxito y error
+☐ @low Go routines
+☐ @high Recargar admin después de hacer una acción
+☐ @high Comprobar opción de disabled cuando no hay
+☐ @critical Chequear que no se suba en una tabla si en la otra no se ha subido
+☐ @high Borrar console logs
+✔ Buscar si existe previamente @done (10/15/2024, 10:30:14 PM)

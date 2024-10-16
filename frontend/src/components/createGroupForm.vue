@@ -25,7 +25,7 @@ async function listCycles() {
 }
 
 async function createGroup() {
-    await CreateGroup(group.value.name.toLowerCase(), group.value.cycle);
+    await CreateGroup(group.value.name, group.value.cycle);
     group.value = {
         name: "",
         cycle: "",

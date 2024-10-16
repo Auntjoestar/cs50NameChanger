@@ -5,7 +5,7 @@ import { CreateProgram } from '../../wailsjs/go/main/App';
 const program = ref("");
 
 async function createProgram() {
-    await CreateProgram(program.value.toLocaleLowerCase());
+    await CreateProgram(program.value);
     program.value = "";
 }
 
