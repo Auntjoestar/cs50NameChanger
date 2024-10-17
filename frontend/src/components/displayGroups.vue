@@ -19,18 +19,18 @@ watchGroups();
 </script>
 
 <template>
-    <table v-if="groups.length > 0">
-        <thead>
+    <table v-if="groups.length > 0" class="table table-striped table-hover">
+        <thead class="table-dark">
             <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Semana</th>
-                <th>Acciones</th>
+                <th scope="col">ID</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">ID Semana</th>
+                <th scope="col">Acciones</th>
             </tr>
         </thead>
-        <tbody>
-            <tr v-for="(group, index) in groups" :key="index">
-                <td>{{ group.id }}</td>
+        <tbody class="text-center">
+            <tr v-for="(group, index) in groups" :key="index" class="text-center">
+                <td scope="row">{{ group.id }}</td>
                 <td>{{ group.name }}</td>
                 <td>{{ group.week_id }}</td>
                 <td>

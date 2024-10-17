@@ -41,14 +41,15 @@ listPrograms();
         <input type="text" v-model="group.name" placeholder="Grupo" class="form-control" />
         <select v-model="group.program" @change="listCycles" class="form-control form-select">
             <option value="" disabled>Selecciona un programa</option>
-            <option v-if = "programs[0] === 'No hay programas'" :value="programs[0]" disabled>{{ programs[0] }}</option>
+            <option v-if="programs[0] === 'No hay programas'" :value="programs[0]" disabled>{{ programs[0] }}</option>
             <option v-else v-for="(program, index) in programs" :key="index">{{ program }}</option>
         </select>
         <select v-model="group.cycle" placeholder="Ciclo" class="form-control form-select">
             <option value="" disabled>Selecciona un ciclo</option>
-            <option v-if = "cycles[0] === 'No hay ciclos'" :value="cycles[0]" disabled>{{ cycles[0] }}</option>
+            <option v-if="cycles[0] === 'No hay ciclos'" :value="cycles[0]" disabled>{{ cycles[0] }}</option>
             <option v-else v-for="(cycle, index) in cycles" :key="index">{{ cycle }}</option>
         </select>
-        <button type="button" class="btn btn-dark" @click="createGroup" >Crear</button>
+        <button type="button" class="btn btn-dark" @click="createGroup"
+            :disabled="group.name === '' || group.program === '' || group.cycle === ''">Crear</button>
     </form>
 </template>

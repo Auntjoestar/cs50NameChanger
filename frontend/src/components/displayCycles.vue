@@ -18,18 +18,18 @@ watchCycles();
 </script>
 
 <template>
-    <table v-if="cycles.length > 0">
-        <thead>
+    <table v-if="cycles.length > 0" class="table table-striped table-bordered">
+        <thead class="table-dark">
             <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Programa</th>
-                <th>Acciones</th>
+                <th scope="col">ID</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">ID Programa</th>
+                <th scope="col">Acciones</th>
             </tr>
         </thead>
         <tbody>
             <tr v-for="(cycle, index) in cycles" :key="index">
-                <td>{{ cycle.id }}</td>
+                <td scope="row">{{ cycle.id }}</td>
                 <td>{{ cycle.name }}</td>
                 <td>{{ cycle.program_id }}</td>
                 <td>
@@ -40,3 +40,6 @@ watchCycles();
     </table>
     <p v-else>No hay ciclos</p>
 </template>
+
+<style>
+</style>

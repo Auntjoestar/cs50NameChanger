@@ -5,6 +5,9 @@ import { ref } from 'vue'
 
 const showAdmin = ref(false)
 
+window.addEventListener('beforeunload', () => {
+  localStorage.clear();
+});
 </script>
 
 <template>

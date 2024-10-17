@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, defineEmits } from 'vue';
 import {
     CreateDB,
     ListPrograms,
@@ -19,6 +19,10 @@ const weeks = ref([]);
 const groups = ref([]);
 const message = ref("");
 const tableVisibility = ref(false);
+const emit = defineEmits('connected');
+
+localStorage.getItem('connected') ? connected.value = true : connected.value = false;
+localStorage.setItem('connected', connected.value);
 
 const newFilesName = reactive({
     name: "",
@@ -159,6 +163,10 @@ function unselectFile(file) {
     newFilesName.files = newFilesName.files.filter(f => f != file);
 }
 
+function sendLoadedState() {
+    emit('connected', connected.value);
+}
+
 initializeForms();
 </script>
 
@@ -174,7 +182,7 @@ initializeForms();
         </div>
     </header>
     <main v-if="!connected">
-        <button @click="connect">Conectar con la base de datos</button>
+        <button @click="() => { connect(); sendLoadedState(); }">Conectar</button>
     </main>
     <button @click="initializeForms" v-if="connected" v-show="!contentLoaded">Cargar datos</button>
     <button @click="initializeForms" v-if="connected && contentLoaded">Recargar datos</button>
@@ -196,8 +204,7 @@ initializeForms();
 
             <div class="input-box">
                 <label for="cycles-options">Escoge el ciclo: </label>
-                <select id="cycles-options" autocomplete="off" class="input" type="text" 
-                v-model="newFilesName.cycle"
+                <select id="cycles-options" autocomplete="off" class="input" type="text" v-model="newFilesName.cycle"
                     @change="(event) => { listWeeks(); listGroups(); makeNewName(); }">
                     <option value="" disabled selected v-if="cycles.length == 0">Cargando ciclos...</option>
                     <option value="" disabled selected v-if="cycles[0] == 'No hay ciclos'">No hay ciclos</option>
@@ -210,8 +217,8 @@ initializeForms();
 
             <div class="input-box">
                 <label for="weeks-options">Escoge la semana: </label>
-                <select id="weeks-options" autocomplete="off" class="input" type="text" 
-                v-model="newFilesName.week" @change="makeNewName">
+                <select id="weeks-options" autocomplete="off" class="input" type="text" v-model="newFilesName.week"
+                    @change="makeNewName">
                     <option value="" disabled selected v-if="weeks.length == 0">Cargando semanas...</option>
                     <option value="" disabled selected v-else>Selecciona una semana</option>
                     <option v-for="(week, index) in weeks" :key="index">
@@ -233,8 +240,8 @@ initializeForms();
             </div>
 
             <div class="input-box">
-                <input id="new-files-name" :value="newFilesName.name" autocomplete="off" 
-                class="input" type="text" placeholder="Nombre del archivo" disabled />
+                <input id="new-files-name" :value="newFilesName.name" autocomplete="off" class="input" type="text"
+                    placeholder="Nombre del archivo" disabled />
             </div>
 
             <div class="input-box">
@@ -273,8 +280,7 @@ initializeForms();
                     "Nombre del archivo" porque la función MakeNewName retorna la previa cadena cuando no se han seleccionado dato 
                      en todos los formularios
                  -->
-                <button @click="changeFileNames"
-                    v-if="newFilesName.files.length > 0 && newFilesName.name != '' 
+                <button @click="changeFileNames" v-if="newFilesName.files.length > 0 && newFilesName.name != ''
                     && newFilesName.name != 'Nombre del archivo'">Cambiar nombres</button>
             </div>
         </div>
