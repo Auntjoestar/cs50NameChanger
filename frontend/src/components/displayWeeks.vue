@@ -9,12 +9,10 @@ const weeks = ref([])
 
 async function watchWeeks() {
     const result = await WatchWeeks();
-    console.log("No hay semanas disponibles");
     if (!result || result.length === 0 || result[0]?.id === 0) {
         return;
     }
     weeks.value = result; // Assign the result directly to weeks
-    console.log(weeks.value);
 }
 
 watchWeeks();

@@ -7,12 +7,9 @@ const groups = ref([])
 async function watchGroups() {
     const result = await WatchGroups();
     if (!result || result.length === 0 || result[0]?.id === 0) {
-        console.log("No hay grupos disponibles");
         return;
     }
-    console.log(result);
     groups.value = result; // Assign the result directly to groups
-    console.log(groups.value);
 }
 
 watchGroups();

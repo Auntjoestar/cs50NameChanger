@@ -2,13 +2,12 @@ package main
 
 import (
 	"context"
+	"cs50NameChanger/models"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
-
-	"cs50NameChanger/models"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"gorm.io/driver/sqlite"
@@ -30,6 +29,22 @@ func NewApp() *App {
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
+func (a *App) shutdown(ctx context.Context) {
+	// Wait for any running operations to complete or handle the context's cancellation
+	select {
+	case <-ctx.Done():
+		// Context canceled, proceed with shutdown
+		log.Println("Shutdown context received, closing resources...")
+	default:
+		// Perform any pre-shutdown actions if necessary
+	}
+
+	// Close the database connection
+	a.CloseDB()
+
+	// Any additional cleanup can be done here
+	log.Println("Application has shut down.")
+}
 
 func (a *App) ConnectDB() (*gorm.DB, error) {
 	db, err := gorm.Open(sqlite.Open("cs50x.db"), &gorm.Config{})
@@ -44,6 +59,18 @@ func (a *App) ConnectDB() (*gorm.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func (a *App) CloseDB() error {
+	db, err := a.ConnectDB()
+	if err != nil {
+		return err
+	}
+	sqlDB, err := db.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.Close()
 }
 
 func (a *App) CreateDB() error {
@@ -256,12 +283,44 @@ func (a *App) OpenFileDialog() ([]string, error) {
 }
 
 func (a *App) ChangeFileNames(files []string, newName string) error {
+	exePath, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	newPath := filepath.Join(filepath.Dir(exePath), newName)
+
+	// Check if the directory already exists
+	if _, err := os.Stat(newPath); os.IsNotExist(err) {
+		// If it doesn't exist, create it
+		err = os.Mkdir(newPath, 0755)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Get the current max index of the files already in the directory
+	maxIndex := 0
+	filesInDir, err := os.ReadDir(newPath)
+	if err != nil {
+		return err
+	}
+
+	for _, f := range filesInDir {
+		fileName := f.Name()
+		var index int
+		// Check if the filename matches the pattern "newName_X.ext" and extract the index
+		_, err := fmt.Sscanf(fileName, newName+"%d", &index)
+		if err == nil && index > maxIndex {
+			maxIndex = index
+		}
+	}
+
+	// Start renaming from the next index
 	for i := 0; i < len(files); i++ {
 		file := files[i]
-		dir := filepath.Dir(file)
-		fileName := filepath.Base(file)
-		newFile := filepath.Join(dir, newName+strconv.Itoa(i+1)+filepath.Ext(fileName))
-		err := os.Rename(file, newFile)
+		newFileName := fmt.Sprintf("%s%d%s", newName, maxIndex+i+1, filepath.Ext(file))
+		newFilePath := filepath.Join(newPath, newFileName)
+		err = os.Rename(file, newFilePath)
 		if err != nil {
 			return err
 		}

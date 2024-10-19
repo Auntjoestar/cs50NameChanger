@@ -5,6 +5,8 @@ import {models} from '../models';
 
 export function ChangeFileNames(arg1:Array<string>,arg2:string):Promise<void>;
 
+export function CloseDB():Promise<void>;
+
 export function ConnectDB():Promise<gorm.DB>;
 
 export function CreateCycle(arg1:string,arg2:string):Promise<void>;

@@ -5,14 +5,11 @@ import { WatchPrograms } from '../../wailsjs/go/main/App';
 const programs = ref([])
 
 async function watchPrograms() {
-    const result = await WatchPrograms(); // Await result from WatchPrograms
+    const result = await WatchPrograms(); 
     if (!result || result.length === 0 || result[0]?.id === 0) {
-        console.log("No hay programas disponibles");
         return;
     }
-    console.log(result);
-    programs.value = result; // Assign the result directly to programs
-    console.log(programs.value); // Safely log the first program's ID
+    programs.value = result; 
 }
 
 watchPrograms();

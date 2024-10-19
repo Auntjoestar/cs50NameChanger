@@ -6,12 +6,10 @@ const cycles = ref([])
 
 async function watchCycles() {
     const result = await WatchCycles();
-    console.log("No hay ciclos disponibles");
     if (!result || result.length === 0 || result[0]?.id === 0) {
         return;
     }
     cycles.value = result; // Assign the result directly to cycles
-    console.log(cycles.value);
 }
 
 watchCycles();

@@ -67,7 +67,6 @@ async function listWeeks() {
             weeks.value = ["Selecciona un ciclo"];
             return;
         }
-        console.log(newFilesName.cycle)
         const result = await ListWeeks(newFilesName.cycle);
         if (result[0] === "No hay semanas") {
             weeks.value = ["No hay semanas"];
