@@ -325,6 +325,14 @@ func (a *App) ChangeFileNames(files []string, newName string) error {
 			return err
 		}
 	}
+
+	a.OpenFolder(newPath)
+
+	return nil
+}
+
+func (a *App) OpenFolder(path string) error {
+	runtime.BrowserOpenURL(a.ctx, "file://"+path)
 	return nil
 }
 

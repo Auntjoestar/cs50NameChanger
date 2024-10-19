@@ -58,6 +58,10 @@ export function OpenFileDialog() {
   return window['go']['main']['App']['OpenFileDialog']();
 }
 
+export function OpenFolder(arg1) {
+  return window['go']['main']['App']['OpenFolder'](arg1);
+}
+
 export function WatchCycles() {
   return window['go']['main']['App']['WatchCycles']();
 }

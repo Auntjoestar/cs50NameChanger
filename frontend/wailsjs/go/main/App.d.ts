@@ -31,6 +31,8 @@ export function MakeNewName(arg1:string,arg2:string,arg3:string,arg4:string):Pro
 
 export function OpenFileDialog():Promise<Array<string>>;
 
+export function OpenFolder(arg1:string):Promise<void>;
+
 export function WatchCycles():Promise<Array<models.CyclesResponse>>;
 
 export function WatchGroups():Promise<Array<models.GroupsResponse>>;
