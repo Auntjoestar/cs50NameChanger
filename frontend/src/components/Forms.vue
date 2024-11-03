@@ -204,14 +204,18 @@ initializeForms();
             <div class="input-box">
                 <label for="cycles-options">Escoge el ciclo: </label>
                 <select id="cycles-options" autocomplete="off" class="input" type="text" v-model="newFilesName.cycle"
-                    @change="(event) => { listWeeks(); listGroups(); makeNewName(); }" v-if="cycles[0] != 'No hay ciclos'">
+                    @change="(event) => { listWeeks(); listGroups(); makeNewName(); }"
+                    v-if="cycles[0] != 'No hay ciclos' && newFilesName.program != ''">
                     <option value="" disabled selected v-if="cycles.length == 0">Cargando ciclos...</option>
                     <option value="" disabled selected v-else>Selecciona un ciclo</option>
                     <option v-for="(cycle, index) in cycles" :key="index">
                         {{ cycle }}
                     </option>
                 </select>
-                
+                <select id="cycles-options" autocomplete="off" class="input" type="text" v-model="newFilesName.cycle"
+                    disabled v-else-if="newFilesName.program == ''">
+                    <option value="" disabled selected>Selecciona un programa</option>
+                </select>
                 <select id="cycles-options" autocomplete="off" class="input" type="text" v-model="newFilesName.cycle"
                     disabled v-else>
                     <option value="" disabled selected>No hay ciclos</option>
@@ -221,12 +225,16 @@ initializeForms();
             <div class="input-box">
                 <label for="weeks-options">Escoge la semana: </label>
                 <select id="weeks-options" autocomplete="off" class="input" type="text" v-model="newFilesName.week"
-                    @change="makeNewName" v-if="weeks[0] != 'No hay semanas' && cycles[0] != 'No hay ciclos'">
+                    @change="makeNewName" v-if="weeks[0] != 'No hay semanas' && cycles[0] != 'No hay ciclos' && newFilesName.cycle != ''">
                     <option value="" disabled selected v-if="weeks.length == 0">Cargando semanas...</option>
                     <option value="" disabled selected v-else>Selecciona una semana</option>
                     <option v-for="(week, index) in weeks" :key="index">
                         {{ week }}
                     </option>
+                </select>
+                <select id="weeks-options" autocomplete="off" class="input" type="text" v-model="newFilesName.week"
+                    disabled v-else-if="newFilesName.cycle == ''">
+                    <option value="" disabled selected>Selecciona un ciclo</option>
                 </select>
                 <select id="weeks-options" autocomplete="off" class="input" type="text" v-model="newFilesName.week"
                     disabled v-else>
@@ -237,12 +245,16 @@ initializeForms();
             <div class="input-box">
                 <label for="groups-options">Escoge el grupo: </label>
                 <select id="groups-options" autocomplete="off" class="input" type="text" v-model="newFilesName.group"
-                    @change="makeNewName" v-if="groups[0] != 'No hay grupos' && cycles[0] != 'No hay ciclos'">
+                    @change="makeNewName" v-if="groups[0] != 'No hay grupos' && cycles[0] != 'No hay ciclos' && newFilesName.cycle != ''">
                     <option value="" disabled selected v-if="groups.length == 0">Cargando grupos...</option>
                     <option value="" disabled selected v-else>Selecciona un grupo</option>
                     <option v-for="(group, index) in groups" :key="index">
                         {{ group }}
                     </option>
+                </select>
+                <select id="groups-options" autocomplete="off" class="input" type="text" v-model="newFilesName.group"
+                    disabled v-else-if="newFilesName.cycle == ''">
+                    <option value="" disabled selected>Selecciona un ciclo</option>
                 </select>
                 <select id="groups-options" autocomplete="off" class="input" type="text" v-model="newFilesName.group"
                     disabled v-else>
