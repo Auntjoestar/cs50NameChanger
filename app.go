@@ -217,9 +217,10 @@ func (a *App) CreateCycle(name string, program string) error {
 			return err
 		}
 		tx.Create(&models.CyclesResponse{
-			ID:        cycle.ID,
-			Name:      cycle.Name,
-			ProgramID: cycle.ProgramID,
+			ID:          cycle.ID,
+			Name:        cycle.Name,
+			ProgramID:   cycle.ProgramID,
+			ProgramName: program,
 		})
 		return nil
 	},
@@ -245,9 +246,10 @@ func (a *App) CreateWeek(name string, cycle string) error {
 			return err
 		}
 		tx.Create(&models.WeeksResponse{
-			ID:      week.ID,
-			Name:    week.Name,
-			CycleID: week.CycleID,
+			ID:        week.ID,
+			Name:      week.Name,
+			CycleID:   week.CycleID,
+			CycleName: cycle,
 		})
 		return nil
 	},
@@ -273,9 +275,10 @@ func (a *App) CreateGroup(name string, cycle string) error {
 			return err
 		}
 		tx.Create(&models.GroupsResponse{
-			ID:      group.ID,
-			Name:    group.Name,
-			CycleID: group.CycleID,
+			ID:        group.ID,
+			Name:      group.Name,
+			CycleID:   group.CycleID,
+			CycleName: cycle,
 		})
 		return nil
 	},
@@ -488,10 +491,13 @@ func (a *App) WatchCycles() []models.CyclesResponse {
 	}
 	var cyclesResponse []models.CyclesResponse
 	for _, cycle := range cycles {
+		var program models.Program
+		db.First(&program, "id = ?", cycle.ProgramID)
 		cyclesResponse = append(cyclesResponse, models.CyclesResponse{
-			ID:        cycle.ID,
-			Name:      cycle.Name,
-			ProgramID: cycle.ProgramID,
+			ID:          cycle.ID,
+			Name:        cycle.Name,
+			ProgramID:   cycle.ProgramID,
+			ProgramName: program.Name,
 		})
 	}
 	return cyclesResponse
@@ -509,10 +515,13 @@ func (a *App) WatchWeeks() []models.WeeksResponse {
 	}
 	var weeksResponse []models.WeeksResponse
 	for _, week := range weeks {
+		var cycle models.Cycle
+		db.First(&cycle, "id = ?", week.CycleID)
 		weeksResponse = append(weeksResponse, models.WeeksResponse{
-			ID:      week.ID,
-			Name:    week.Name,
-			CycleID: week.CycleID,
+			ID:        week.ID,
+			Name:      week.Name,
+			CycleID:   week.CycleID,
+			CycleName: cycle.Name,
 		})
 	}
 	return weeksResponse
@@ -530,10 +539,13 @@ func (a *App) WatchGroups() []models.GroupsResponse {
 	}
 	var groupsResponse []models.GroupsResponse
 	for _, group := range groups {
+		var cycle models.Cycle
+		db.First(&cycle, "id = ?", group.CycleID)
 		groupsResponse = append(groupsResponse, models.GroupsResponse{
-			ID:      group.ID,
-			Name:    group.Name,
-			CycleID: group.CycleID,
+			ID:        group.ID,
+			Name:      group.Name,
+			CycleID:   group.CycleID,
+			CycleName: cycle.Name,
 		})
 	}
 	return groupsResponse

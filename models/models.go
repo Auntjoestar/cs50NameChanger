@@ -42,24 +42,27 @@ type ProgramsResponse struct {
 }
 
 type CyclesResponse struct {
-	ID        uint   `json:"id"`
-	Name      string `json:"name"`
-	ProgramID uint   `json:"program_id"`
-	Program   ProgramsResponse
-	Weeks     []WeeksResponse  `gorm:"foreignKey:CycleID" json:"weeks"`
-	Groups    []GroupsResponse `gorm:"foreignKey:CycleID" json:"groups"`
+	ID          uint   `json:"id"`
+	Name        string `json:"name"`
+	ProgramID   uint   `json:"program_id"`
+	ProgramName string `json:"program_name"`
+	Program     ProgramsResponse
+	Weeks       []WeeksResponse  `gorm:"foreignKey:CycleID" json:"weeks"`
+	Groups      []GroupsResponse `gorm:"foreignKey:CycleID" json:"groups"`
 }
 
 type WeeksResponse struct {
-	ID      uint   `json:"id"`
-	Name    string `json:"name"`
-	CycleID uint   `json:"cycle_id"`
-	Cycle   CyclesResponse
+	ID        uint   `json:"id"`
+	Name      string `json:"name"`
+	CycleID   uint   `json:"cycle_id"`
+	CycleName string `json:"cycle_name"`
+	Cycle     CyclesResponse
 }
 
 type GroupsResponse struct {
-	ID      uint   `json:"id"`
-	Name    string `json:"name"`
-	CycleID uint   `json:"cycle_id"`
-	Cycle   CyclesResponse
+	ID        uint   `json:"id"`
+	Name      string `json:"name"`
+	CycleID   uint   `json:"cycle_id"`
+	CycleName string `json:"cycle_name"`
+	Cycle     CyclesResponse
 }

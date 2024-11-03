@@ -30,7 +30,7 @@ watchGroups();
                 <th scope="col" hidden>ID</th>
                 <th scope="col">Índice</th>
                 <th scope="col">Nombre</th>
-                <th scope="col">ID Ciclo</th>
+                <th scope="col">Ciclo</th>
                 <th scope="col">Acciones</th>
             </tr>
         </thead>
@@ -39,7 +39,7 @@ watchGroups();
                 <td scope="row" hidden>{{ group.id }}</td>
                 <td>{{ index + 1 }}</td>
                 <td>{{ group.name }}</td>
-                <td>{{ group.cycle_id }}</td>
+                <td>{{ group.cycle_name }}</td>
                 <td>
                     <button class="btn btn-danger" @click="deleteGroup(group.id)">Eliminar</button>
                 </td>

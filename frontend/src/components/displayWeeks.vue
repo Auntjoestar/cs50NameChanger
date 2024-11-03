@@ -31,7 +31,7 @@ watchWeeks();
                 <th class="text-center" scope="col" hidden>ID</th>
                 <th class="text-center" scope="col">Índice</th>
                 <th class="text-center" scope="col">Nombre</th>
-                <th class="text-center" scope="col">ID Ciclo</th>
+                <th class="text-center" scope="col">Ciclo</th>
                 <th class="text-center" scope="col">Acciones</th>
             </tr>
         </thead>
@@ -40,7 +40,7 @@ watchWeeks();
                 <td class="text-center" scope="row" hidden>{{ week.id }}</td>
                 <td class="text-center">{{ index + 1 }}</td>
                 <td class="text-center">{{ week.name }}</td>
-                <td class="text-center">{{ week.cycle_id }}</td>
+                <td class="text-center">{{ week.cycle_name }}</td>
                 <td class="text-center">
                     <button class="btn btn-danger" @click="deleteWeek(week.id)">Eliminar</button>
                 </td>

@@ -10,6 +10,7 @@ async function watchCycles() {
         return;
     }
     cycles.value = result; // Assign the result directly to cycles
+    console.log(cycles.value);
 }
 
 function deleteCycle(id) {
@@ -27,7 +28,7 @@ watchCycles();
                 <th scope="col" hidden>ID</th>
                 <th scope="col">Índice</th>
                 <th scope="col">Nombre</th>
-                <th scope="col">ID Programa</th>
+                <th scope="col">Programa</th>
                 <th scope="col">Acciones</th>
             </tr>
         </thead>
@@ -36,7 +37,7 @@ watchCycles();
                 <td scope="row" hidden>{{ cycle.id }}</td>
                 <td>{{ index + 1 }}</td>
                 <td>{{ cycle.name }}</td>
-                <td>{{ cycle.program_id }}</td>
+                <td>{{ cycle.program_name }}</td>
                 <td>
                     <button class="btn btn-danger" @click="deleteCycle(cycle.id)">Eliminar</button>
                 </td>
