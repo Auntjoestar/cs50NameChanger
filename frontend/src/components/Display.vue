@@ -42,7 +42,7 @@ const displayView = reactive({
     </div>
 </template>
 
-<style type="scss">
+<style type="scss" scopeds>
 .content {
     display: flex;
 }

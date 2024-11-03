@@ -42,7 +42,7 @@ const createView = reactive({
     </div>
 </template>
 
-<style type="scss">
+<style type="scss" scoped>
 .content {
     display: flex;
 }

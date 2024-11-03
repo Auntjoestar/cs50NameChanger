@@ -286,7 +286,7 @@ initializeForms();
     </main>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 body {
     background-color: #f2f2f2;
 }
