@@ -1,6 +1,9 @@
 <script setup>
 import { ref } from 'vue'
-import { WatchGroups } from '../../wailsjs/go/main/App';
+import { 
+    WatchGroups,
+    DeleteGroup,
+} from '../../wailsjs/go/main/App';
 
 const groups = ref([])
 
@@ -12,6 +15,11 @@ async function watchGroups() {
     groups.value = result; // Assign the result directly to groups
 }
 
+async function deleteGroup(id) {
+    DeleteGroup(id);
+    groups.value = groups.value.filter(group => group.id !== id);
+}
+
 watchGroups();
 </script>
 
@@ -19,19 +27,21 @@ watchGroups();
     <table v-if="groups.length > 0" class="table table-striped table-hover">
         <thead class="table-dark">
             <tr>
-                <th scope="col">ID</th>
+                <th scope="col" hidden>ID</th>
+                <th scope="col">Índice</th>
                 <th scope="col">Nombre</th>
-                <th scope="col">ID Semana</th>
+                <th scope="col">ID Ciclo</th>
                 <th scope="col">Acciones</th>
             </tr>
         </thead>
         <tbody class="text-center">
             <tr v-for="(group, index) in groups" :key="index" class="text-center">
-                <td scope="row">{{ group.id }}</td>
+                <td scope="row" hidden>{{ group.id }}</td>
+                <td>{{ index + 1 }}</td>
                 <td>{{ group.name }}</td>
-                <td>{{ group.week_id }}</td>
+                <td>{{ group.cycle_id }}</td>
                 <td>
-                    <button class="btn btn-danger">Eliminar</button>
+                    <button class="btn btn-danger" @click="deleteGroup(group.id)">Eliminar</button>
                 </td>
             </tr>
         </tbody>
