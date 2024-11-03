@@ -21,7 +21,7 @@ watchPrograms();
 </script>
 
 <template>
-    <table class="table table-striped table-hover" v-if="programs.length > 0">
+    <table class="table table-striped table-hover table-bordered" v-if="programs.length > 0">
         <thead class="table-dark">
             <tr class="text-center">
                 <th class="text-center" scope="col" hidden>ID</th>

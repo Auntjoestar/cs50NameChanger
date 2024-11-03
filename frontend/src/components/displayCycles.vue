@@ -22,7 +22,7 @@ watchCycles();
 </script>
 
 <template>
-    <table v-if="cycles.length > 0" class="table table-striped table-bordered">
+    <table v-if="cycles.length > 0" class="table table-striped table-bordered table-hover">
         <thead class="table-dark">
             <tr>
                 <th scope="col" hidden>ID</th>

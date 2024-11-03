@@ -24,7 +24,7 @@ watchGroups();
 </script>
 
 <template>
-    <table v-if="groups.length > 0" class="table table-striped table-hover">
+    <table v-if="groups.length > 0" class="table table-striped table-hover table-bordered">
         <thead class="table-dark">
             <tr>
                 <th scope="col" hidden>ID</th>

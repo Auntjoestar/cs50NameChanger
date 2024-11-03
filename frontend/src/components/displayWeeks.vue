@@ -25,7 +25,7 @@ watchWeeks();
 </script>
 
 <template>
-    <table v-if="weeks.length > 0" class="table table-striped table-hover">
+    <table v-if="weeks.length > 0" class="table table-striped table-hover table-bordered">
         <thead class="table-dark">
             <tr class="text-center">
                 <th class="text-center" scope="col" hidden>ID</th>
