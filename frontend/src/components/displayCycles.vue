@@ -13,7 +13,6 @@ async function watchCycles() {
         return;
     }
     cycles.value = result;
-    console.log(cycles.value);
 }
 
 function promptDeleteCycle(id) {
@@ -39,29 +38,31 @@ watchCycles();
 </script>
 
 <template>
-    <table v-if="cycles.length > 0" class="table table-striped table-bordered table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th scope="col" hidden>ID</th>
-                <th scope="col">Índice</th>
-                <th scope="col">Nombre</th>
-                <th scope="col">Programa</th>
-                <th scope="col">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="(cycle, index) in cycles" :key="index">
-                <td scope="row" hidden>{{ cycle.id }}</td>
-                <td>{{ index + 1 }}</td>
-                <td>{{ cycle.name }}</td>
-                <td>{{ cycle.program_name }}</td>
-                <td>
-                    <button class="btn btn-danger" @click="promptDeleteCycle(cycle.id)">Eliminar</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <p v-else>No hay ciclos</p>
+    <div class="table-container">
+        <table v-if="cycles.length > 0" class="custom-table">
+            <thead>
+                <tr>
+                    <th scope="col" hidden>ID</th>
+                    <th scope="col">Índice</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Programa</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(cycle, index) in cycles" :key="cycle.id">
+                    <td hidden>{{ cycle.id }}</td>
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ cycle.name }}</td>
+                    <td>{{ cycle.program_name }}</td>
+                    <td>
+                        <button class="btn-delete" @click="promptDeleteCycle(cycle.id)">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p v-else>No hay ciclos</p>
+    </div>
 
     <ConfirmDialog
         v-if="showConfirmDialog"
@@ -72,5 +73,44 @@ watchCycles();
     />
 </template>
 
-<style>
+<style scoped>
+.table-container {
+    margin: 20px;
+    overflow-x: auto;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+}
+
+.custom-table th, .custom-table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.custom-table thead {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.custom-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.btn-delete {
+    padding: 6px 12px;
+    background-color: #dc3545;
+    border: none;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+}
 </style>

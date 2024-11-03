@@ -38,29 +38,31 @@ watchGroups();
 </script>
 
 <template>
-    <table v-if="groups.length > 0" class="table table-striped table-hover table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th scope="col" hidden>ID</th>
-                <th scope="col">Índice</th>
-                <th scope="col">Nombre</th>
-                <th scope="col">Ciclo</th>
-                <th scope="col">Acciones</th>
-            </tr>
-        </thead>
-        <tbody class="text-center">
-            <tr v-for="(group, index) in groups" :key="index" class="text-center">
-                <td scope="row" hidden>{{ group.id }}</td>
-                <td>{{ index + 1 }}</td>
-                <td>{{ group.name }}</td>
-                <td>{{ group.cycle_name }}</td>
-                <td>
-                    <button class="btn btn-danger" @click="promptDeleteGroup(group.id)">Eliminar</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <p v-else>No hay grupos</p>
+    <div class="table-container">
+        <table v-if="groups.length > 0" class="custom-table">
+            <thead>
+                <tr>
+                    <th hidden>ID</th>
+                    <th>Índice</th>
+                    <th>Nombre</th>
+                    <th>Ciclo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(group, index) in groups" :key="index">
+                    <td hidden>{{ group.id }}</td>
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ group.name }}</td>
+                    <td>{{ group.cycle_name }}</td>
+                    <td>
+                        <button class="btn-delete" @click="promptDeleteGroup(group.id)">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p v-else>No hay grupos</p>
+    </div>
 
     <!-- Confirmation Dialog -->
     <ConfirmDialog
@@ -72,5 +74,44 @@ watchGroups();
     />
 </template>
 
-<style>
+<style scoped>
+.table-container {
+    margin: 20px;
+    overflow-x: auto;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+}
+
+.custom-table th, .custom-table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.custom-table thead {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.custom-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.btn-delete {
+    padding: 6px 12px;
+    background-color: #dc3545;
+    border: none;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+}
 </style>

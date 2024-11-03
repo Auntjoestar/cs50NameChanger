@@ -38,29 +38,31 @@ watchWeeks();
 </script>
 
 <template>
-    <table v-if="weeks.length > 0" class="table table-striped table-hover table-bordered">
-        <thead class="table-dark">
-            <tr class="text-center">
-                <th class="text-center" scope="col" hidden>ID</th>
-                <th class="text-center" scope="col">Índice</th>
-                <th class="text-center" scope="col">Nombre</th>
-                <th class="text-center" scope="col">Ciclo</th>
-                <th class="text-center" scope="col">Acciones</th>
-            </tr>
-        </thead>
-        <tbody class="text-center">
-            <tr v-for="(week, index) in weeks" :key="index" class="text-center">
-                <td class="text-center" scope="row" hidden>{{ week.id }}</td>
-                <td class="text-center">{{ index + 1 }}</td>
-                <td class="text-center">{{ week.name }}</td>
-                <td class="text-center">{{ week.cycle_name }}</td>
-                <td class="text-center">
-                    <button class="btn btn-danger" @click="promptDeleteWeek(week.id)">Eliminar</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <p v-else>No hay semanas</p>
+    <div class="table-container">
+        <table v-if="weeks.length > 0" class="custom-table">
+            <thead>
+                <tr>
+                    <th hidden>ID</th>
+                    <th>Índice</th>
+                    <th>Nombre</th>
+                    <th>Ciclo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(week, index) in weeks" :key="index">
+                    <td hidden>{{ week.id }}</td>
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ week.name }}</td>
+                    <td>{{ week.cycle_name }}</td>
+                    <td>
+                        <button class="btn-delete" @click="promptDeleteWeek(week.id)">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p v-else>No hay semanas</p>
+    </div>
 
     <!-- Confirmation Dialog -->
     <ConfirmDialog
@@ -72,5 +74,44 @@ watchWeeks();
     />
 </template>
 
-<style>
+<style scoped>
+.table-container {
+    margin: 20px;
+    overflow-x: auto;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+}
+
+.custom-table th, .custom-table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.custom-table thead {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.custom-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.btn-delete {
+    padding: 6px 12px;
+    background-color: #dc3545;
+    border: none;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+}
 </style>
