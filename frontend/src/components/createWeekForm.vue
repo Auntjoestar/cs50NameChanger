@@ -29,6 +29,7 @@ async function createWeek() {
     week.value = {
         name: "",
         cycle: "",
+        program: "",
     }
 }
 
@@ -39,7 +40,7 @@ listPrograms();
     <form>
         <h2 class="form-title">Crear Semana</h2>
         <input type="text" v-model="week.name" placeholder="Semana" class="form-control" />
-        <select v-model="week.program" @change="listCycles" class="form-control form-select">
+        <select v-model="week.program" @change="listCycles" class="form-control form-select" placeholder="Programa">
             <option value="" disabled>Selecciona un programa</option>
             <option v-if="programs[0] === 'No hay programas'" :value="programs[0]" disabled>{{ programs[0] }}</option>
             <option v-else v-for="(program, index) in programs" :key="index">{{ program }}</option>

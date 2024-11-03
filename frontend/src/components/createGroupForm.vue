@@ -29,6 +29,7 @@ async function createGroup() {
     group.value = {
         name: "",
         cycle: "",
+        program: "",
     }
 }
 
