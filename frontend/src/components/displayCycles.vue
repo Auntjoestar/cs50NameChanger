@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { WatchCycles } from '../../wailsjs/go/main/App';
+import { WatchCycles, DeleteCycle } from '../../wailsjs/go/main/App';
 
 const cycles = ref([])
 
@@ -12,6 +12,11 @@ async function watchCycles() {
     cycles.value = result; // Assign the result directly to cycles
 }
 
+function deleteCycle(id) {
+    DeleteCycle(id);
+    cycles.value = cycles.value.filter(cycle => cycle.id !== id);
+}
+
 watchCycles();
 </script>
 
@@ -19,7 +24,8 @@ watchCycles();
     <table v-if="cycles.length > 0" class="table table-striped table-bordered">
         <thead class="table-dark">
             <tr>
-                <th scope="col">ID</th>
+                <th scope="col" hidden>ID</th>
+                <th scope="col">Índice</th>
                 <th scope="col">Nombre</th>
                 <th scope="col">ID Programa</th>
                 <th scope="col">Acciones</th>
@@ -27,11 +33,12 @@ watchCycles();
         </thead>
         <tbody>
             <tr v-for="(cycle, index) in cycles" :key="index">
-                <td scope="row">{{ cycle.id }}</td>
+                <td scope="row" hidden>{{ cycle.id }}</td>
+                <td>{{ index + 1 }}</td>
                 <td>{{ cycle.name }}</td>
                 <td>{{ cycle.program_id }}</td>
                 <td>
-                    <button class="btn btn-danger">Eliminar</button>
+                    <button class="btn btn-danger" @click="deleteCycle(cycle.id)">Eliminar</button>
                 </td>
             </tr>
         </tbody>

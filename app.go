@@ -153,115 +153,235 @@ func (a *App) ListGroups(cycle string) []string {
 	return groupNames
 }
 
-func (a *App) CreateProgram(name string) error {
+func (a *App) executeInTransaction(fn func(*gorm.DB) error) error {
 	db, err := a.ConnectDB()
 	if err != nil {
 		return err
 	}
 
-	var count int64
-	err = db.Table("programs").Where("UPPER(name) = ?", strings.ToUpper(name)).Count(&count).Error
-	if err != nil {
-		return err
-	}
-	if count > 0 {
-		return fmt.Errorf("el programa %s ya existe", name)
-	}
+	tx := db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
 
-	program := models.Program{Name: name}
-	err = db.Create(&program).Error
-	if err != nil {
+	if err := fn(tx); err != nil {
+		tx.Rollback()
 		return err
 	}
 
-	db.Create(&models.ProgramsResponse{
-		ID:   program.ID,
-		Name: program.Name,
-	})
+	return tx.Commit().Error
+}
+
+func (a *App) CreateProgram(name string) error {
+	a.executeInTransaction(func(tx *gorm.DB) error {
+		var count int64
+		err := tx.Table("programs").Where("UPPER(name) = ?", strings.ToUpper(name)).Count(&count).Error
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			return fmt.Errorf("el programa %s ya existe", name)
+		}
+		program := models.Program{Name: name}
+		err = tx.Create(&program).Error
+		if err != nil {
+			return err
+		}
+		tx.Create(&models.ProgramsResponse{
+			ID:   program.ID,
+			Name: program.Name,
+		})
+		return nil
+	},
+	)
 	return nil
 }
 
 func (a *App) CreateCycle(name string, program string) error {
-	db, err := a.ConnectDB()
-	if err != nil {
-		return err
-	}
-	var count int64
-	err = db.Table("cycles").Where("UPPER(name) = ? AND program_id = ?", strings.ToUpper(name), program).Count(&count).Error
-	if err != nil {
-		return err
-	}
-	if count > 0 {
-		return fmt.Errorf("el ciclo %s ya existe", name)
-	}
-	var programDB models.Program
-	db.First(&programDB, "name = ?", program)
-	cycle := models.Cycle{Name: name, ProgramID: programDB.ID}
-	err = db.Create(&cycle).Error
-	if err != nil {
-		return err
-	}
-	db.Create(&models.CyclesResponse{
-		ID:        cycle.ID,
-		Name:      cycle.Name,
-		ProgramID: cycle.ProgramID,
-	})
+	a.executeInTransaction(func(tx *gorm.DB) error {
+		var count int64
+		err := tx.Table("cycles").Where("UPPER(name) = ? AND program_id = ?", strings.ToUpper(name), program).Count(&count).Error
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			return fmt.Errorf("el ciclo %s ya existe", name)
+		}
+		var programDB models.Program
+		tx.First(&programDB, "name = ?", program)
+		cycle := models.Cycle{Name: name, ProgramID: programDB.ID}
+		err = tx.Create(&cycle).Error
+		if err != nil {
+			return err
+		}
+		tx.Create(&models.CyclesResponse{
+			ID:        cycle.ID,
+			Name:      cycle.Name,
+			ProgramID: cycle.ProgramID,
+		})
+		return nil
+	},
+	)
 	return nil
 }
 
 func (a *App) CreateWeek(name string, cycle string) error {
-	db, err := a.ConnectDB()
-	if err != nil {
-		return err
-	}
-	var count int64
-	err = db.Table("weeks").Where("UPPER(name) = ? AND cycle_id = ?", strings.ToUpper(name), cycle).Count(&count).Error
-	if err != nil {
-		return err
-	}
-	if count > 0 {
-		return fmt.Errorf("la semana %s ya existe", name)
-	}
-	var cycleDB models.Cycle
-	db.First(&cycleDB, "name = ?", cycle)
-	week := models.Week{Name: name, CycleID: cycleDB.ID}
-	err = db.Create(&week).Error
-	if err != nil {
-		return err
-	}
-	db.Create(&models.WeeksResponse{
-		ID:      week.ID,
-		Name:    week.Name,
-		CycleID: week.CycleID,
-	})
+	a.executeInTransaction(func(tx *gorm.DB) error {
+		var count int64
+		err := tx.Table("weeks").Where("UPPER(name) = ? AND cycle_id = ?", strings.ToUpper(name), cycle).Count(&count).Error
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			return fmt.Errorf("la semana %s ya existe", name)
+		}
+		var cycleDB models.Cycle
+		tx.First(&cycleDB, "name = ?", cycle)
+		week := models.Week{Name: name, CycleID: cycleDB.ID}
+		err = tx.Create(&week).Error
+		if err != nil {
+			return err
+		}
+		tx.Create(&models.WeeksResponse{
+			ID:      week.ID,
+			Name:    week.Name,
+			CycleID: week.CycleID,
+		})
+		return nil
+	},
+	)
 	return nil
 }
 
 func (a *App) CreateGroup(name string, cycle string) error {
-	db, err := a.ConnectDB()
-	if err != nil {
-		return err
-	}
-	var count int64
-	err = db.Table("groups").Where("UPPER(name) = ? AND cycle_id = ?", strings.ToUpper(name), cycle).Count(&count).Error
-	if err != nil {
-		return err
-	}
-	if count > 0 {
-		return fmt.Errorf("el grupo %s ya existe", name)
-	}
-	var cycleDB models.Cycle
-	db.First(&cycleDB, "name = ?", cycle)
-	group := models.Group{Name: name, CycleID: cycleDB.ID}
-	err = db.Create(&group).Error
-	if err != nil {
-		return err
-	}
-	db.Create(&models.GroupsResponse{
-		ID:      group.ID,
-		Name:    group.Name,
-		CycleID: group.CycleID,
-	})
+	a.executeInTransaction(func(tx *gorm.DB) error {
+		var count int64
+		err := tx.Table("groups").Where("UPPER(name) = ? AND cycle_id = ?", strings.ToUpper(name), cycle).Count(&count).Error
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			return fmt.Errorf("el grupo %s ya existe", name)
+		}
+		var cycleDB models.Cycle
+		tx.First(&cycleDB, "name = ?", cycle)
+		group := models.Group{Name: name, CycleID: cycleDB.ID}
+		err = tx.Create(&group).Error
+		if err != nil {
+			return err
+		}
+		tx.Create(&models.GroupsResponse{
+			ID:      group.ID,
+			Name:    group.Name,
+			CycleID: group.CycleID,
+		})
+		return nil
+	},
+	)
+	return nil
+}
+
+func (a *App) DeleteProgram(id int) error {
+	a.executeInTransaction(func(tx *gorm.DB) error {
+		var program models.Program
+		err := tx.First(&program, "id = ?", id).Error
+		if err != nil {
+			return err
+		}
+		err = tx.Unscoped().Delete(&program).Error
+		if err != nil {
+			return err
+		}
+		tx.Unscoped().Delete(&models.ProgramsResponse{}, "id = ?", program.ID)
+		var cycles []models.Cycle
+		tx.Find(&cycles, "program_id = ?", program.ID)
+		for _, cycle := range cycles {
+			tx.Unscoped().Delete(&cycle)
+			tx.Unscoped().Delete(&models.CyclesResponse{}, "id = ?", cycle.ID)
+			var weeks []models.Week
+			tx.Find(&weeks, "cycle_id = ?", cycle.ID)
+			for _, week := range weeks {
+				tx.Unscoped().Delete(&week)
+				tx.Unscoped().Delete(&models.WeeksResponse{}, "id = ?", week.ID)
+				var groups []models.Group
+				tx.Find(&groups, "cycle_id = ?", cycle.ID)
+				for _, group := range groups {
+					tx.Unscoped().Delete(&group)
+					tx.Unscoped().Delete(&models.GroupsResponse{}, "id = ?", group.ID)
+				}
+			}
+		}
+		return nil
+	},
+	)
+	return nil
+}
+
+func (a *App) DeleteCycle(id int) error {
+	a.executeInTransaction(func(tx *gorm.DB) error {
+		var cycle models.Cycle
+		err := tx.First(&cycle, "id = ?", id).Error
+		if err != nil {
+			return err
+		}
+		err = tx.Unscoped().Delete(&cycle).Error
+		if err != nil {
+			return err
+		}
+		tx.Unscoped().Delete(&models.CyclesResponse{}, "id = ?", cycle.ID)
+		var weeks []models.Week
+		tx.Find(&weeks, "cycle_id = ?", cycle.ID)
+		for _, week := range weeks {
+			tx.Unscoped().Delete(&week)
+			tx.Unscoped().Delete(&models.WeeksResponse{}, "id = ?", week.ID)
+		}
+		var groups []models.Group
+		tx.Find(&groups, "cycle_id = ?", cycle.ID)
+		for _, group := range groups {
+			tx.Unscoped().Delete(&group)
+			tx.Unscoped().Delete(&models.GroupsResponse{}, "id = ?", group.ID)
+		}
+		return nil
+	},
+	)
+	return nil
+}
+
+func (a *App) DeleteWeek(id int) error {
+	a.executeInTransaction(func(tx *gorm.DB) error {
+		var week models.Week
+		err := tx.First(&week, "id = ?", id).Error
+		if err != nil {
+			return err
+		}
+		err = tx.Unscoped().Delete(&week).Error
+		if err != nil {
+			return err
+		}
+		tx.Unscoped().Delete(&models.WeeksResponse{}, "id = ?", week.ID)
+		return nil
+	},
+	)
+	return nil
+}
+
+func (a *App) DeleteGroup(id int) error {
+	a.executeInTransaction(func(tx *gorm.DB) error {
+		var group models.Group
+		err := tx.First(&group, "id = ?", id).Error
+		if err != nil {
+			return err
+		}
+		err = tx.Unscoped().Delete(&group).Error
+		if err != nil {
+			return err
+		}
+		tx.Unscoped().Delete(&models.GroupsResponse{}, "id = ?", group.ID)
+		return nil
+	},
+	)
 	return nil
 }
 

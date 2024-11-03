@@ -19,6 +19,14 @@ export function CreateProgram(arg1:string):Promise<void>;
 
 export function CreateWeek(arg1:string,arg2:string):Promise<void>;
 
+export function DeleteCycle(arg1:number):Promise<void>;
+
+export function DeleteGroup(arg1:number):Promise<void>;
+
+export function DeleteProgram(arg1:number):Promise<void>;
+
+export function DeleteWeek(arg1:number):Promise<void>;
+
 export function ListCycles(arg1:string):Promise<Array<string>>;
 
 export function ListGroups(arg1:string):Promise<Array<string>>;

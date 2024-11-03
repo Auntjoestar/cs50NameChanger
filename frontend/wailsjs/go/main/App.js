@@ -34,6 +34,22 @@ export function CreateWeek(arg1, arg2) {
   return window['go']['main']['App']['CreateWeek'](arg1, arg2);
 }
 
+export function DeleteCycle(arg1) {
+  return window['go']['main']['App']['DeleteCycle'](arg1);
+}
+
+export function DeleteGroup(arg1) {
+  return window['go']['main']['App']['DeleteGroup'](arg1);
+}
+
+export function DeleteProgram(arg1) {
+  return window['go']['main']['App']['DeleteProgram'](arg1);
+}
+
+export function DeleteWeek(arg1) {
+  return window['go']['main']['App']['DeleteWeek'](arg1);
+}
+
 export function ListCycles(arg1) {
   return window['go']['main']['App']['ListCycles'](arg1);
 }
