@@ -1,12 +1,11 @@
 <script setup>
-import { ref } from 'vue'
-import {
-    WatchWeeks,
-    DeleteWeek,
-}
-    from '../../wailsjs/go/main/App';
+import { ref } from 'vue';
+import { WatchWeeks, DeleteWeek } from '../../wailsjs/go/main/App';
+import ConfirmDialog from './ConfirmDialog.vue';
 
-const weeks = ref([])
+const weeks = ref([]);
+const showConfirmDialog = ref(false);
+const selectedWeekId = ref(null);
 
 async function watchWeeks() {
     const result = await WatchWeeks();
@@ -16,9 +15,23 @@ async function watchWeeks() {
     weeks.value = result;
 }
 
-async function deleteWeek(id) {
-    DeleteWeek(id);
-    weeks.value = weeks.value.filter(week => week.id !== id);
+function promptDeleteWeek(id) {
+    selectedWeekId.value = id;
+    showConfirmDialog.value = true;
+}
+
+function confirmDeleteWeek() {
+    if (selectedWeekId.value !== null) {
+        DeleteWeek(selectedWeekId.value);
+        weeks.value = weeks.value.filter(week => week.id !== selectedWeekId.value);
+        showConfirmDialog.value = false;
+        selectedWeekId.value = null;
+    }
+}
+
+function cancelDeleteWeek() {
+    showConfirmDialog.value = false;
+    selectedWeekId.value = null;
 }
 
 watchWeeks();
@@ -42,10 +55,22 @@ watchWeeks();
                 <td class="text-center">{{ week.name }}</td>
                 <td class="text-center">{{ week.cycle_name }}</td>
                 <td class="text-center">
-                    <button class="btn btn-danger" @click="deleteWeek(week.id)">Eliminar</button>
+                    <button class="btn btn-danger" @click="promptDeleteWeek(week.id)">Eliminar</button>
                 </td>
             </tr>
         </tbody>
     </table>
     <p v-else>No hay semanas</p>
+
+    <!-- Confirmation Dialog -->
+    <ConfirmDialog
+        v-if="showConfirmDialog"
+        title="Confirmar eliminación"
+        message="¿Estás seguro de que deseas eliminar esta semana?"
+        @confirm="confirmDeleteWeek"
+        @cancel="cancelDeleteWeek"
+    />
 </template>
+
+<style>
+</style>

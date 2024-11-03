@@ -1,21 +1,38 @@
 <script setup>
-import { ref } from 'vue'
+import { ref } from 'vue';
 import { WatchCycles, DeleteCycle } from '../../wailsjs/go/main/App';
+import ConfirmDialog from './ConfirmDialog.vue';
 
-const cycles = ref([])
+const cycles = ref([]);
+const showConfirmDialog = ref(false);
+const selectedCycleId = ref(null);
 
 async function watchCycles() {
     const result = await WatchCycles();
     if (!result || result.length === 0 || result[0]?.id === 0) {
         return;
     }
-    cycles.value = result; // Assign the result directly to cycles
+    cycles.value = result;
     console.log(cycles.value);
 }
 
-function deleteCycle(id) {
-    DeleteCycle(id);
-    cycles.value = cycles.value.filter(cycle => cycle.id !== id);
+function promptDeleteCycle(id) {
+    selectedCycleId.value = id;
+    showConfirmDialog.value = true;
+}
+
+function confirmDeleteCycle() {
+    if (selectedCycleId.value !== null) {
+        DeleteCycle(selectedCycleId.value);
+        cycles.value = cycles.value.filter(cycle => cycle.id !== selectedCycleId.value);
+        showConfirmDialog.value = false;
+        selectedCycleId.value = null;
+    }
+}
+
+function cancelDeleteCycle() {
+    showConfirmDialog.value = false;
+    selectedCycleId.value = null;
 }
 
 watchCycles();
@@ -39,12 +56,20 @@ watchCycles();
                 <td>{{ cycle.name }}</td>
                 <td>{{ cycle.program_name }}</td>
                 <td>
-                    <button class="btn btn-danger" @click="deleteCycle(cycle.id)">Eliminar</button>
+                    <button class="btn btn-danger" @click="promptDeleteCycle(cycle.id)">Eliminar</button>
                 </td>
             </tr>
         </tbody>
     </table>
     <p v-else>No hay ciclos</p>
+
+    <ConfirmDialog
+        v-if="showConfirmDialog"
+        title="Confirmar eliminación"
+        message="¿Estás seguro de que deseas eliminar este ciclo?"
+        @confirm="confirmDeleteCycle"
+        @cancel="cancelDeleteCycle"
+    />
 </template>
 
 <style>
