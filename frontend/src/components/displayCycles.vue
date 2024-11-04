@@ -91,6 +91,10 @@ watchCycles();
 </template>
 
 <style scoped lang="scss">
+h2 {
+    margin-bottom: 1.2rem;
+}
+
 .table-container {
     max-height: 400px;
     overflow-y: auto;

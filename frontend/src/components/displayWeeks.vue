@@ -87,6 +87,10 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
+h2 {
+    margin-bottom: 1.2rem;
+}
+
 .table-container {
     margin: 1%;
 }
