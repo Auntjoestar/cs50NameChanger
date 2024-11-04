@@ -398,6 +398,12 @@ func (a *App) MakeNewName(program string, cycle string, week string, group strin
 func (a *App) OpenFileDialog() ([]string, error) {
 	filepath, err := runtime.OpenMultipleFilesDialog(a.ctx, runtime.OpenDialogOptions{
 		Title: "Ingresa los archivos que desee modificar",
+		Filters: []runtime.FileFilter{
+			{
+				DisplayName: "Images (*.png;*.jpg;*.jpeg)",
+				Pattern:     "*.png;*.jpg;*.jpeg",
+			},
+		},
 	})
 	if err != nil {
 		return nil, err

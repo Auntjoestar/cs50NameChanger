@@ -31,7 +31,12 @@ window.addEventListener('beforeunload', () => {
   </div>
 </template>
 
-<style scoped>
+<style>
+body {
+  background-color: #f8f9fa;
+}
+
+
 .main-container {
   position: relative;
 }
