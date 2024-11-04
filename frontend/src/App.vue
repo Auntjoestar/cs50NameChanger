@@ -25,10 +25,9 @@ window.addEventListener('beforeunload', () => {
   <div class="main-container">
     <Admin v-if="showAdmin" />
     <Forms v-else />
-    
+
     <!-- Circular Toggle Button -->
-    <ToggleButton @toggle="toggleAdminView" 
-                  :element="showAdmin ? 'fa-image' : 'fa-database'" />
+    <ToggleButton @toggle="toggleAdminView" :element="showAdmin ? 'fa-image' : 'fa-database'" />
   </div>
 </template>
 

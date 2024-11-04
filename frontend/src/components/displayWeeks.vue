@@ -1,18 +1,25 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { WatchWeeks, DeleteWeek } from '../../wailsjs/go/main/App';
 import ConfirmDialog from './ConfirmDialog.vue';
 
 const weeks = ref([]);
 const showConfirmDialog = ref(false);
 const selectedWeekId = ref(null);
+const isLoading = ref(true); // Add loading state
 
 async function watchWeeks() {
-    const result = await WatchWeeks();
-    if (!result || result.length === 0 || result[0]?.id === 0) {
-        return;
+    try {
+        const result = await WatchWeeks();
+        if (!result || result.length === 0 || result[0]?.id === 0) {
+            return;
+        }
+        weeks.value = result;
+    } catch (error) {
+        console.error("Error fetching weeks:", error);
+    } finally {
+        isLoading.value = false; // Set loading to false once the fetching is done
     }
-    weeks.value = result;
 }
 
 function promptDeleteWeek(id) {
@@ -34,71 +41,92 @@ function cancelDeleteWeek() {
     selectedWeekId.value = null;
 }
 
-watchWeeks();
+// Fetch weeks when the component is mounted
+onMounted(() => {
+    watchWeeks();
+});
 </script>
 
 <template>
-    <div class="table-container">
-        <table v-if="weeks.length > 0" class="custom-table">
-            <thead>
-                <tr>
-                    <th hidden>ID</th>
-                    <th>Índice</th>
-                    <th>Nombre</th>
-                    <th>Ciclo</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(week, index) in weeks" :key="index">
-                    <td hidden>{{ week.id }}</td>
-                    <td>{{ index + 1 }}</td>
-                    <td>{{ week.name }}</td>
-                    <td>{{ week.cycle_name }}</td>
-                    <td>
-                        <button class="btn-delete" @click="promptDeleteWeek(week.id)">Eliminar</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <p v-else>No hay semanas</p>
+    <h2>Semanas (Total: {{ weeks.length }})</h2>
+    <div class="table-container" v-if="weeks.length > 0 || isLoading">
+        <div v-if="isLoading" class="loading-indicator">Cargando...</div>
+        <div class="table-wrapper">
+            <table v-if="!isLoading && weeks.length > 0" class="custom-table">
+                <thead>
+                    <tr>
+                        <th hidden>ID</th>
+                        <th>Índice</th>
+                        <th>Nombre</th>
+                        <th>Ciclo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(week, index) in weeks" :key="index">
+                        <td hidden>{{ week.id }}</td>
+                        <td>{{ index + 1 }}</td>
+                        <td>{{ week.name }}</td>
+                        <td>{{ week.cycle_name }}</td>
+                        <td>
+                            <button class="btn-delete" @click="promptDeleteWeek(week.id)"
+                                aria-label="Eliminar semana">Eliminar</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="no-weeks" v-else>
+        <p class="empty-state">No hay semanas para mostrar.</p>
     </div>
 
-    <!-- Confirmation Dialog -->
-    <ConfirmDialog
-        v-if="showConfirmDialog"
-        title="Confirmar eliminación"
-        message="¿Estás seguro de que deseas eliminar esta semana?"
-        @confirm="confirmDeleteWeek"
-        @cancel="cancelDeleteWeek"
-    />
+    <ConfirmDialog v-if="showConfirmDialog" title="Confirmar eliminación"
+        message="¿Estás seguro de que deseas eliminar esta semana?" @confirm="confirmDeleteWeek"
+        @cancel="cancelDeleteWeek" />
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .table-container {
-    margin: 20px;
-    overflow-x: auto;
+    margin: 1%;
+}
+
+.table-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
 }
 
 .custom-table {
     width: 100%;
     border-collapse: collapse;
     font-family: Arial, sans-serif;
-}
 
-.custom-table th, .custom-table td {
-    padding: 12px;
-    text-align: center;
-    border: 1px solid #ddd;
-}
+    th,
+    td {
+        padding: 12px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-top: none;
 
-.custom-table thead {
-    background-color: #343a40;
-    color: #fff;
-}
+    }
 
-.custom-table tbody tr:hover {
-    background-color: #f9f9f9;
+    th {
+        top: 0;
+        border-top: none;
+    }
+
+    thead th {
+        background-color: #343a40;
+        color: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    tbody tr:hover {
+        background-color: #f1f1f1;
+    }
 }
 
 .btn-delete {
@@ -113,5 +141,21 @@ watchWeeks();
 
 .btn-delete:hover {
     background-color: #c82333;
+}
+
+.loading-indicator {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #007bff;
+    padding: 20px;
+}
+
+.no-weeks {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90%;
+    color: #666;
+    font-size: 1.1rem;
 }
 </style>

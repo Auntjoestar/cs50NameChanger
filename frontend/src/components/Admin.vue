@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from 'vue';
+import { reactive, onMounted, onUnmounted } from 'vue';
 
 import Create from './Create.vue';
 import Display from './Display.vue';
@@ -7,6 +7,16 @@ import Display from './Display.vue';
 const view = reactive({
     create: false,
     display: true,
+});
+
+
+onMounted(() => {
+    document.body.style.overflow = 'hidden'; 
+});
+
+
+onUnmounted(() => {
+    document.body.style.overflow = ''; 
 });
 </script>
 
@@ -75,4 +85,5 @@ const view = reactive({
     background-color: #f8f9fa;
     width: 100%;
 }
+
 </style>

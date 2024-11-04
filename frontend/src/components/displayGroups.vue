@@ -1,18 +1,25 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { WatchGroups, DeleteGroup } from '../../wailsjs/go/main/App';
 import ConfirmDialog from './ConfirmDialog.vue';
 
 const groups = ref([]);
 const showConfirmDialog = ref(false);
 const selectedGroupId = ref(null);
+const isLoading = ref(true); // Loading state
 
 async function watchGroups() {
-    const result = await WatchGroups();
-    if (!result || result.length === 0 || result[0]?.id === 0) {
-        return;
+    try {
+        const result = await WatchGroups();
+        if (!result || result.length === 0 || result[0]?.id === 0) {
+            return;
+        }
+        groups.value = result;
+    } catch (error) {
+        console.error("Error fetching groups:", error);
+    } finally {
+        isLoading.value = false; // Set loading to false once the fetching is done
     }
-    groups.value = result;
 }
 
 function promptDeleteGroup(id) {
@@ -34,71 +41,92 @@ function cancelDeleteGroup() {
     selectedGroupId.value = null;
 }
 
-watchGroups();
+// Fetch groups when the component is mounted
+onMounted(() => {
+    watchGroups();
+});
 </script>
 
 <template>
-    <div class="table-container">
-        <table v-if="groups.length > 0" class="custom-table">
-            <thead>
-                <tr>
-                    <th hidden>ID</th>
-                    <th>Índice</th>
-                    <th>Nombre</th>
-                    <th>Ciclo</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(group, index) in groups" :key="index">
-                    <td hidden>{{ group.id }}</td>
-                    <td>{{ index + 1 }}</td>
-                    <td>{{ group.name }}</td>
-                    <td>{{ group.cycle_name }}</td>
-                    <td>
-                        <button class="btn-delete" @click="promptDeleteGroup(group.id)">Eliminar</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <p v-else>No hay grupos</p>
+    <h2>Grupos (Total: {{ groups.length }})</h2>
+    <div class="table-container" v-if="groups.length > 0 || isLoading">
+        <div v-if="isLoading" class="loading-indicator">Cargando...</div>
+        <div class="table-wrapper">
+            <table v-if="!isLoading && groups.length > 0" class="custom-table">
+                <thead>
+                    <tr>
+                        <th hidden>ID</th>
+                        <th>Índice</th>
+                        <th>Nombre</th>
+                        <th>Ciclo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(group, index) in groups" :key="index">
+                        <td hidden>{{ group.id }}</td>
+                        <td>{{ index + 1 }}</td>
+                        <td>{{ group.name }}</td>
+                        <td>{{ group.cycle_name }}</td>
+                        <td>
+                            <button class="btn-delete" @click="promptDeleteGroup(group.id)"
+                                aria-label="Eliminar grupo">Eliminar</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div v-else class="no-groups">
+        <p>No hay grupos</p>
     </div>
 
-    <!-- Confirmation Dialog -->
-    <ConfirmDialog
-        v-if="showConfirmDialog"
-        title="Confirmar eliminación"
-        message="¿Estás seguro de que deseas eliminar este grupo?"
-        @confirm="confirmDeleteGroup"
-        @cancel="cancelDeleteGroup"
-    />
+    <ConfirmDialog v-if="showConfirmDialog" title="Confirmar eliminación"
+        message="¿Estás seguro de que deseas eliminar este grupo?" @confirm="confirmDeleteGroup"
+        @cancel="cancelDeleteGroup" />
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .table-container {
-    margin: 20px;
-    overflow-x: auto;
+    margin: 1%;
+}
+
+.table-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
 }
 
 .custom-table {
     width: 100%;
     border-collapse: collapse;
     font-family: Arial, sans-serif;
-}
 
-.custom-table th, .custom-table td {
-    padding: 12px;
-    text-align: center;
-    border: 1px solid #ddd;
-}
+    th,
+    td {
+        padding: 12px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-top: none;
 
-.custom-table thead {
-    background-color: #343a40;
-    color: #fff;
-}
+    }
 
-.custom-table tbody tr:hover {
-    background-color: #f1f1f1;
+    th {
+        top: 0;
+        border-top: none;
+    }
+
+    thead th {
+        background-color: #343a40;
+        color: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    tbody tr:hover {
+        background-color: #f1f1f1;
+    }
 }
 
 .btn-delete {
@@ -113,5 +141,21 @@ watchGroups();
 
 .btn-delete:hover {
     background-color: #c82333;
+}
+
+.loading-indicator {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #007bff;
+    padding: 20px;
+}
+
+.no-groups {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90%;
+    color: #666;
+    font-size: 1.1rem;
 }
 </style>

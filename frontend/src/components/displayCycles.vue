@@ -1,18 +1,29 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { WatchCycles, DeleteCycle } from '../../wailsjs/go/main/App';
 import ConfirmDialog from './ConfirmDialog.vue';
 
 const cycles = ref([]);
 const showConfirmDialog = ref(false);
 const selectedCycleId = ref(null);
+const isLoading = ref(true); // Loading state
+const errorMessage = ref(null); // Error handling
 
 async function watchCycles() {
-    const result = await WatchCycles();
-    if (!result || result.length === 0 || result[0]?.id === 0) {
-        return;
+    try {
+        const result = await WatchCycles();
+        if (!result || result.length === 0 || result[0]?.id === 0) {
+            cycles.value = [];
+            errorMessage.value = null; // Reset error message
+            return;
+        }
+        cycles.value = result;
+    } catch (error) {
+        console.error("Error fetching cycles:", error);
+        errorMessage.value = "Error al cargar los ciclos. Por favor, inténtelo de nuevo más tarde."; // User-friendly error message
+    } finally {
+        isLoading.value = false; // Set loading to false once fetching is done
     }
-    cycles.value = result;
 }
 
 function promptDeleteCycle(id) {
@@ -20,12 +31,17 @@ function promptDeleteCycle(id) {
     showConfirmDialog.value = true;
 }
 
-function confirmDeleteCycle() {
+async function confirmDeleteCycle() {
     if (selectedCycleId.value !== null) {
-        DeleteCycle(selectedCycleId.value);
-        cycles.value = cycles.value.filter(cycle => cycle.id !== selectedCycleId.value);
-        showConfirmDialog.value = false;
-        selectedCycleId.value = null;
+        try {
+            await DeleteCycle(selectedCycleId.value); // Awaiting deletion
+            cycles.value = cycles.value.filter(cycle => cycle.id !== selectedCycleId.value);
+            showConfirmDialog.value = false;
+            selectedCycleId.value = null;
+        } catch (error) {
+            console.error("Error deleting cycle:", error);
+            errorMessage.value = "Error al eliminar el ciclo. Por favor, inténtelo de nuevo."; // User-friendly error message
+        }
     }
 }
 
@@ -38,8 +54,11 @@ watchCycles();
 </script>
 
 <template>
-    <div class="table-container">
-        <table v-if="cycles.length > 0" class="custom-table">
+    <h2>Ciclos (Total: {{ cycles.length }})</h2> 
+    <div class="table-container" v-if="cycles.length > 0 || isLoading || errorMessage">
+        <div v-if="isLoading" class="loading-indicator">Cargando...</div> 
+        <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div> 
+        <table v-else-if="cycles.length > 0" class="custom-table">
             <thead>
                 <tr>
                     <th scope="col" hidden>ID</th>
@@ -61,43 +80,48 @@ watchCycles();
                 </tr>
             </tbody>
         </table>
-        <p v-else>No hay ciclos</p>
+    </div>
+    <div class="no-cycles" v-else>
+        <p>No hay ciclos</p>
     </div>
 
-    <ConfirmDialog
-        v-if="showConfirmDialog"
-        title="Confirmar eliminación"
-        message="¿Estás seguro de que deseas eliminar este ciclo?"
-        @confirm="confirmDeleteCycle"
-        @cancel="cancelDeleteCycle"
-    />
+    <ConfirmDialog v-if="showConfirmDialog" title="Confirmar eliminación"
+        message="¿Estás seguro de que deseas eliminar este ciclo?" @confirm="confirmDeleteCycle"
+        @cancel="cancelDeleteCycle" />
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .table-container {
-    margin: 20px;
-    overflow-x: auto;
+    max-height: 400px;
+    overflow-y: auto;
+    margin: 1%;
+    border: 1px solid #ddd;
 }
 
 .custom-table {
     width: 100%;
     border-collapse: collapse;
     font-family: Arial, sans-serif;
-}
 
-.custom-table th, .custom-table td {
-    padding: 12px;
-    text-align: center;
-    border: 1px solid #ddd;
-}
+    th,
+    td {
+        padding: 12px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-top: none;
+    }
 
-.custom-table thead {
-    background-color: #343a40;
-    color: #fff;
-}
+    thead th {
+        background-color: #343a40;
+        color: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
 
-.custom-table tbody tr:hover {
-    background-color: #f9f9f9;
+    tbody tr:hover {
+        background-color: #f9f9f9;
+    }
 }
 
 .btn-delete {
@@ -108,9 +132,32 @@ watchCycles();
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+
+    &:hover {
+        background-color: #c82333;
+    }
 }
 
-.btn-delete:hover {
-    background-color: #c82333;
+#error-message {
+    color: #dc3545;
+    /* Red color for error messages */
+    text-align: center;
+    margin: 10px 0;
+}
+
+.loading-indicator {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #007bff;
+    padding: 20px;
+}
+
+.no-cycles {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90%;
+    color: #666;
+    font-size: 1.1rem;
 }
 </style>

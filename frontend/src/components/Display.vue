@@ -2,10 +2,10 @@
 import { reactive } from 'vue';
 import Sidebar from './Sidebar.vue'; // Import the Sidebar component
 
-import DisplayPrograms from './DisplayPrograms.vue';
-import DisplayCycles from './DisplayCycles.vue';
-import DisplayWeeks from './DisplayWeeks.vue';
-import DisplayGroups from './DisplayGroups.vue';
+import DisplayPrograms from './displayPrograms.vue';
+import DisplayCycles from './displayCycles.vue';
+import DisplayWeeks from './displayWeeks.vue';
+import DisplayGroups from './displayGroups.vue';
 
 const displayView = reactive({
     programs: true,
@@ -42,7 +42,8 @@ const updateView = (view) => {
 
 .tables {
     width: 100%;
-    padding: 20px; /* Add padding to the content area */
+    padding: 20px;
+    /* Add padding to the content area */
     background-color: #f8f9fa;
 }
 </style>
