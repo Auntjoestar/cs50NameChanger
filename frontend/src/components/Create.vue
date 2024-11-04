@@ -1,5 +1,6 @@
 <script setup>
 import { reactive } from 'vue';
+import Sidebar from './Sidebar.vue'; // Import the Sidebar component
 
 import ProgramForm from './CreateProgramForm.vue';
 import CycleForm from './CreateCycleForm.vue';
@@ -11,43 +12,37 @@ const createView = reactive({
     cycles: false,
     weeks: false,
     groups: false,
-})
+});
+
+// Method to update the view
+const updateView = (view) => {
+    createView.programs = view === 'programs';
+    createView.cycles = view === 'cycles';
+    createView.weeks = view === 'weeks';
+    createView.groups = view === 'groups';
+};
 </script>
 
 <template>
     <div class="content">
-        <div class="navbar">
-            <nav>
-                <ul>
-                    <li @click="createView.programs = true; createView.cycles = false;
-                    createView.weeks = false; createView.groups = false">Programas</li>
-                    <li @click="createView.programs = false; createView.cycles = true;
-                    createView.weeks = false; createView.groups = false">Ciclos</li>
-                    <li @click="createView.programs = false; createView.cycles = false;
-                    createView.weeks = true; createView.groups = false">Semanas</li>
-                    <li @click="createView.programs = false; createView.cycles = false;
-                    createView.weeks = false; createView.groups = true">Grupos</li>
-                </ul>
-            </nav>
-        </div>
+        <Sidebar :displayView="createView" :updateView="updateView" /> <!-- Use Sidebar -->
         <div class="tables">
             <ProgramForm v-if="createView.programs" />
-
             <CycleForm v-if="createView.cycles" />
-
             <WeekForm v-if="createView.weeks" />
-
             <GroupForm v-if="createView.groups" />
         </div>
     </div>
 </template>
 
-<style type="scss" scoped>
+<style scoped lang="scss">
 .content {
     display: flex;
 }
 
 .tables {
     width: 100%;
+    padding: 20px; /* Add padding to the content area */
+    background-color: #f8f9fa;
 }
 </style>

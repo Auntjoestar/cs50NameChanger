@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from 'vue'
+import { reactive } from 'vue';
 
 import Create from './Create.vue';
 import Display from './Display.vue';
@@ -7,39 +7,72 @@ import Display from './Display.vue';
 const view = reactive({
     create: false,
     display: true,
-})
-
+});
 </script>
 
 <template>
-    <header>
-        <nav class="navbar navbar-expand-lg bg-body-tertiary">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">Panel de administración</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#ver"
-                                @click="() => { view.create = false; view.display = true }">Ver</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#crear"
-                                @click="() => { view.create = true; view.display = false }">Crear
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+    <header class="admin-header">
+        <nav class="navbar">
+            <a class="navbar-brand" href="#">Panel de administración</a>
+            <div class="navbar-buttons">
+                <a class="nav-link" href="#ver"
+                    :class="{ active: view.display }"
+                    @click="() => { view.create = false; view.display = true }">Ver</a>
+                <a class="nav-link" href="#crear"
+                    :class="{ active: view.create }"
+                    @click="() => { view.create = true; view.display = false }">Crear</a>
             </div>
         </nav>
     </header>
-    <main>
+    <main class="admin-content">
         <Display v-if="view.display" />
-
         <Create v-if="view.create" />
     </main>
 </template>
+
+<style scoped lang="scss">
+.admin-header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .navbar {
+        display: flex;
+        align-items: center;
+        width: 100%;
+
+        .navbar-brand {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .navbar-buttons {
+            display: flex;
+
+            .nav-link {
+                color: #ccc;
+                text-decoration: none;
+                padding: 8px 12px;
+                margin-right: 10px;
+                transition: color 0.3s, background-color 0.3s;
+                border-radius: 4px;
+
+                &.active, &:hover {
+                    background-color: #007bff;
+                    color: #fff;
+                }
+            }
+        }
+    }
+}
+
+.admin-content {
+    background-color: #f8f9fa;
+    width: 100%;
+}
+</style>
