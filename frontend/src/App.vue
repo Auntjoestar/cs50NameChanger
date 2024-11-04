@@ -33,9 +33,19 @@ window.addEventListener('beforeunload', () => {
 
 <style>
 body {
-  background-color: #f8f9fa;
+  background-color: transparent;
 }
 
+.main-container {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.1); /* Match app background */
+}
+
+
+#app { 
+  background-color: rgba(255, 255, 255, 0.1); /* Slightly translucent white background */
+  backdrop-filter: blur(5px);
+}
 
 .main-container {
   position: relative;

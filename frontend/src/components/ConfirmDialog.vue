@@ -42,6 +42,7 @@ function onCancel() {
   justify-content: center;
   opacity: 0;
   animation: fadeIn 0.3s forwards;
+  z-index: 1000;
 }
 
 .dialog-content {

@@ -333,13 +333,14 @@ initializeForms();
     height: 1%;
 }
 
-body {
-    background-color: #f8f9fa;
-}
 
 header {
     text-align: center;
     margin-bottom: 2rem;
+}
+
+.filename {
+    
 }
 
 .message {
