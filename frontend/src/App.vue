@@ -32,22 +32,17 @@ window.addEventListener('beforeunload', () => {
 </template>
 
 <style>
+html {
+  background-color: #f8f9fa;
+}
+
 body {
-  background-color: transparent;
+  background-color: #f8f9fa !important;
 }
 
 .main-container {
   position: relative;
-  background-color: rgba(255, 255, 255, 0.1); /* Match app background */
+  background-color: #f8f9fa;
 }
 
-
-#app { 
-  background-color: rgba(255, 255, 255, 0.1); /* Slightly translucent white background */
-  backdrop-filter: blur(5px);
-}
-
-.main-container {
-  position: relative;
-}
 </style>

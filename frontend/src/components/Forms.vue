@@ -11,6 +11,7 @@ import {
     ChangeFileNames
 } from '../../wailsjs/go/main/App';
 
+
 const connected = ref(false);
 const contentLoaded = ref(false);
 const programs = ref([]);
@@ -20,6 +21,7 @@ const groups = ref([]);
 const message = ref("");
 const tableVisibility = ref(false);
 const emit = defineEmits('connected');
+
 
 localStorage.getItem('connected') ? connected.value = true : connected.value = false;
 localStorage.setItem('connected', connected.value);
@@ -170,156 +172,194 @@ initializeForms();
 </script>
 
 <template>
-    <header>
-        <h1>Bienvenido a CS50 Name Changer</h1>
-        <p>El programa de <strong>cs50x.ni</strong> para renombrar las imagenes según el formato oficial.</p>
-        <div class="message" v-if="!connected">
-            <p>Al parecer no estás conectado a la base de datos, por favor, conectate para continuar.</p>
+    <div class="layout-container">
+        <aside class="sidebar">
+            <h1>
+                CS50 Name Changer
+            </h1>
+        </aside>
+
+        <div v-if="!connected || !contentLoaded" class="not-loaded">
+            <main v-if="!connected" class="container">
+                <div class="message" v-if="!connected">
+                    <p>Al parecer no estás conectado a la base de datos, por favor, conectate para continuar.</p>
+                </div>
+                <div class="message">
+                    <p>{{ message }}</p>
+                </div>
+                <button class="btn-connect" @click="() => { connect(); sendLoadedState(); }">Conectar</button>
+            </main>
+            <footer>
+                <p>&copy; 2024 - CS50 Name Changer</p>
+            </footer>
+            <button class="btn-load" @click="initializeForms" v-if="connected" v-show="!contentLoaded">Cargar
+                datos</button>
         </div>
-        <div class="message">
-            <p>{{ message }}</p>
-        </div>
-    </header>
-    <main v-if="!connected" class="container">
-        <button class="btn-connect" @click="() => { connect(); sendLoadedState(); }">Conectar</button>
-    </main>
-    <button class="btn-load" @click="initializeForms" v-if="connected" v-show="!contentLoaded">Cargar datos</button>
-    <main v-if="connected && contentLoaded" class="container">
-        <div class="forms-container">
-            <div class="choices">
-                <div class="input-box">
-                    <label for="programs-options">Escoge el programa: </label>
-                    <select id="programs-options" autocomplete="off" class="input" type="text"
-                        v-model="newFilesName.program" @change="(event) => { listCycles(); makeNewName(); }">
-                        <option value="" disabled selected v-if="programs.length == 0">Cargando programas...</option>
-                        <option value="" disabled selected v-if="programs[0] == 'No hay programas'">No hay programas
-                        </option>
-                        <option value="" disabled selected v-else>Selecciona un programa</option>
-                        <option v-for="(program, index) in programs" :key="index">
-                            {{ program }}
-                        </option>
-                    </select>
-                </div>
+        <div v-else>
+            <main class="main-container">
+                <div class="forms-container">
+                    <div class="choices">
+                        <div class="input-box">
+                            <label for="programs-options">Escoge el programa: </label>
+                            <select id="programs-options" autocomplete="off" class="input" type="text"
+                                v-model="newFilesName.program" @change="(event) => { listCycles(); makeNewName(); }">
+                                <option value="" disabled selected v-if="programs.length == 0">Cargando programas...
+                                </option>
+                                <option value="" disabled selected v-if="programs[0] == 'No hay programas'">No hay
+                                    programas
+                                </option>
+                                <option value="" disabled selected v-else>Selecciona un programa</option>
+                                <option v-for="(program, index) in programs" :key="index">
+                                    {{ program }}
+                                </option>
+                            </select>
+                        </div>
 
-                <div class="input-box">
-                    <label for="cycles-options">Escoge el ciclo: </label>
-                    <select id="cycles-options" autocomplete="off" class="input" type="text"
-                        v-model="newFilesName.cycle" @change="(event) => { listWeeks(); listGroups(); makeNewName(); }"
-                        v-if="cycles[0] != 'No hay ciclos' && newFilesName.program != ''">
-                        <option value="" disabled selected v-if="cycles.length == 0">Cargando ciclos...</option>
-                        <option value="" disabled selected v-else>Selecciona un ciclo</option>
-                        <option v-for="(cycle, index) in cycles" :key="index">
-                            {{ cycle }}
-                        </option>
-                    </select>
-                    <select id="cycles-options" autocomplete="off" class="input" type="text"
-                        v-model="newFilesName.cycle" disabled v-else-if="newFilesName.program == ''">
-                        <option value="" disabled selected>Selecciona un programa</option>
-                    </select>
-                    <select id="cycles-options" autocomplete="off" class="input" type="text"
-                        v-model="newFilesName.cycle" disabled v-else>
-                        <option value="" disabled selected>No hay ciclos</option>
-                    </select>
-                </div>
+                        <div class="input-box">
+                            <label for="cycles-options">Escoge el ciclo: </label>
+                            <select id="cycles-options" autocomplete="off" class="input" type="text"
+                                v-model="newFilesName.cycle"
+                                @change="(event) => { listWeeks(); listGroups(); makeNewName(); }"
+                                v-if="cycles[0] != 'No hay ciclos' && newFilesName.program != ''">
+                                <option value="" disabled selected v-if="cycles.length == 0">Cargando ciclos...</option>
+                                <option value="" disabled selected v-else>Selecciona un ciclo</option>
+                                <option v-for="(cycle, index) in cycles" :key="index">
+                                    {{ cycle }}
+                                </option>
+                            </select>
+                            <select id="cycles-options" autocomplete="off" class="input" type="text"
+                                v-model="newFilesName.cycle" disabled v-else-if="newFilesName.program == ''">
+                                <option value="" disabled selected>Selecciona un programa</option>
+                            </select>
+                            <select id="cycles-options" autocomplete="off" class="input" type="text"
+                                v-model="newFilesName.cycle" disabled v-else>
+                                <option value="" disabled selected>No hay ciclos</option>
+                            </select>
+                        </div>
 
-                <div class="input-box">
-                    <label for="weeks-options">Escoge la semana: </label>
-                    <select id="weeks-options" autocomplete="off" class="input" type="text" v-model="newFilesName.week"
-                        @change="makeNewName"
-                        v-if="weeks[0] != 'No hay semanas' && cycles[0] != 'No hay ciclos' && newFilesName.cycle != ''">
-                        <option value="" disabled selected v-if="weeks.length == 0">Cargando semanas...</option>
-                        <option value="" disabled selected v-else>Selecciona una semana</option>
-                        <option v-for="(week, index) in weeks" :key="index">
-                            {{ week }}
-                        </option>
-                    </select>
-                    <select id="weeks-options" autocomplete="off" class="input" type="text" v-model="newFilesName.week"
-                        disabled v-else-if="newFilesName.cycle == ''">
-                        <option value="" disabled selected>Selecciona un ciclo</option>
-                    </select>
-                    <select id="weeks-options" autocomplete="off" class="input" type="text" v-model="newFilesName.week"
-                        disabled v-else>
-                        <option value="" disabled selected>No hay semanas</option>
-                    </select>
-                </div>
+                        <div class="input-box">
+                            <label for="weeks-options">Escoge la semana: </label>
+                            <select id="weeks-options" autocomplete="off" class="input" type="text"
+                                v-model="newFilesName.week" @change="makeNewName"
+                                v-if="weeks[0] != 'No hay semanas' && cycles[0] != 'No hay ciclos' && newFilesName.cycle != ''">
+                                <option value="" disabled selected v-if="weeks.length == 0">Cargando semanas...</option>
+                                <option value="" disabled selected v-else>Selecciona una semana</option>
+                                <option v-for="(week, index) in weeks" :key="index">
+                                    {{ week }}
+                                </option>
+                            </select>
+                            <select id="weeks-options" autocomplete="off" class="input" type="text"
+                                v-model="newFilesName.week" disabled v-else-if="newFilesName.cycle == ''">
+                                <option value="" disabled selected>Selecciona un ciclo</option>
+                            </select>
+                            <select id="weeks-options" autocomplete="off" class="input" type="text"
+                                v-model="newFilesName.week" disabled v-else>
+                                <option value="" disabled selected>No hay semanas</option>
+                            </select>
+                        </div>
 
-                <div class="input-box">
-                    <label for="groups-options">Escoge el grupo: </label>
-                    <select id="groups-options" autocomplete="off" class="input" type="text"
-                        v-model="newFilesName.group" @change="makeNewName"
-                        v-if="groups[0] != 'No hay grupos' && weeks[0] != 'No hay semanas' && cycles[0] != 'No hay ciclos'">
-                        <option value="" disabled selected v-if="groups.length == 0">Cargando grupos...</option>
-                        <option value="" disabled selected v-else>Selecciona un grupo</option>
-                        <option v-for="(group, index) in groups" :key="index">
-                            {{ group }}
-                        </option>
-                    </select>
-                    <select id="groups-options" autocomplete="off" class="input" type="text"
-                        v-model="newFilesName.group" disabled v-else-if="newFilesName.week == ''">
-                        <option value="" disabled selected>Selecciona una semana</option>
-                    </select>
-                    <select id="groups-options" autocomplete="off" class="input" type="text"
-                        v-model="newFilesName.group" disabled v-else>
-                        <option value="" disabled selected>No hay grupos</option>
-                    </select>
-                </div>
+                        <div class="input-box">
+                            <label for="groups-options">Escoge el grupo: </label>
+                            <select id="groups-options" autocomplete="off" class="input" type="text"
+                                v-model="newFilesName.group" @change="makeNewName"
+                                v-if="groups[0] != 'No hay grupos' && weeks[0] != 'No hay semanas' && cycles[0] != 'No hay ciclos'">
+                                <option value="" disabled selected v-if="groups.length == 0">Cargando grupos...</option>
+                                <option value="" disabled selected v-else>Selecciona un grupo</option>
+                                <option v-for="(group, index) in groups" :key="index">
+                                    {{ group }}
+                                </option>
+                            </select>
+                            <select id="groups-options" autocomplete="off" class="input" type="text"
+                                v-model="newFilesName.group" disabled v-else-if="newFilesName.week == ''">
+                                <option value="" disabled selected>Selecciona una semana</option>
+                            </select>
+                            <select id="groups-options" autocomplete="off" class="input" type="text"
+                                v-model="newFilesName.group" disabled v-else>
+                                <option value="" disabled selected>No hay grupos</option>
+                            </select>
+                        </div>
 
-                <div class="file-selection">
-                    <button class="btn-select" @click="selectFiles">
-                        <i class="fas fa-folder-open"></i>
-                    </button>
-                    <button class="btn-add" @click="addFiles" v-if="newFilesName.files.length > 0">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            </div>
+                        <div class="input-box" v-if="newFilesName.name">
+                            <label for="new-name">Nombre del archivo: </label>
+                            <p class="name-para"><strong>{{ newFilesName.name }}</strong></p>
+                        </div>
 
-            <button class="btn-refresh" @click="initializeForms" v-if="connected && contentLoaded">
-                <i class="fas fa-sync-alt"></i>
-            </button>
-        </div>
-
-        <div v-if="newFilesName.files.length > 0">
-            <h2>Archivos Seleccionados:</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(file, index) in newFilesName.files" :key="index">
-                        <td>{{ file }}</td>
-                        <td>
-                            <button class="btn btn-danger" @click="() => unselectFile(file)">
-                                <i class="fas fa-trash"></i>
+                        <div class="input-box" v-else>
+                            <label for="complete">Nombre del archivo: </label>
+                            <p class="name-para"><strong id="complete">Complete todos los campos</strong></p>
+                        </div>
+                        <div class="file-selection">
+                            <button class="btn-select" @click="selectFiles">
+                                <i class="fas fa-folder-open"></i>
                             </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                            <button class="btn-add" @click="addFiles" v-if="newFilesName.files.length > 0">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn-refresh" @click="initializeForms" v-if="connected && contentLoaded">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+
+                <div v-if="newFilesName.files.length > 0">
+                    <h2>Archivos Seleccionados:</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(file, index) in newFilesName.files" :key="index">
+                                <td>{{ file }}</td>
+                                <td>
+                                    <button class="btn btn-danger" @click="() => unselectFile(file)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <div class="actions">
+                            <button class="btn-change" @click="changeFileNames" v-if="newFilesName.name">
+                                Cambiar nombres
+                            </button>
+                        </div>
+                    </table>
+                </div>
+            </main>
+            <footer>
+                <p>&copy; 2024 - CS50 Name Changer</p>
+            </footer>
         </div>
-        <div class="filename">
-            <h2>Nuevo nombre:</h2>
-            <p>{{ newFilesName.name }}</p>
-        </div>
-        <div class="actions">
-            <button class="btn-change" @click="changeFileNames">Cambiar nombres</button>
-        </div>
-    </main>
-    <footer>
-        <p>&copy; 2024 - CS50 Name Changer</p>
-    </footer>
+    </div>
 </template>
 
-<style scoped>
-.forms-container {
+<style scoped lang="scss">
+.layout-container {
     display: flex;
     flex-direction: row;
-    gap: 1rem;
-    width: 100%;
     justify-content: space-between;
+    gap: 1rem;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 200px;
+    height: 100vh;
+    background-color: #333;
+    padding-top: 20px;
+    color: white;
+    text-align: center;
+    overflow-y: auto;
+}
+
+.forms-container {
+    display: flex;
+    gap: 1rem;
 }
 
 .btn-refresh {
@@ -333,15 +373,24 @@ initializeForms();
     height: 1%;
 }
 
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    flex-grow: 1;
+}
+
 
 header {
     text-align: center;
     margin-bottom: 2rem;
 }
 
-.filename {
-    
-}
+
 
 .message {
     color: red;
@@ -363,6 +412,11 @@ header {
 .input-box {
     display: flex;
     flex-direction: column;
+
+    label {
+        text-align: start;
+        font-weight: 500;
+    }
 }
 
 .input {
@@ -405,19 +459,48 @@ header {
 table {
     width: 100%;
     border-collapse: collapse;
-}
 
-table th,
-table td {
-    padding: 0.5rem;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+    th,
+    td {
+        padding: 0.5rem;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
 }
 
 footer {
     text-align: center;
-    margin-top: 2rem;
     font-size: 0.8rem;
     color: #666;
+}
+
+.not-loaded {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-grow: 1;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background-color: #f8f9fa;
+    flex-grow: 1;
+    width: 70vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 1rem;
+    margin: auto;
+}
+
+#new-name {
+    margin-top: 1rem;
+}
+
+.name-para {
+    margin-top: 1rem;
 }
 </style>
