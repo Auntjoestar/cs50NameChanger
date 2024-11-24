@@ -50,7 +50,7 @@ listPrograms();
             <option v-if="cycles[0] === 'No hay ciclos'" :value="cycles[0]" disabled>{{ cycles[0] }}</option>
             <option v-else v-for="(cycle, index) in cycles" :key="index">{{ cycle }}</option>
         </select>
-        <button type="button" class="btn btn-dark" @click="createGroup"
+        <button type="button" class="btn btn-dark" @click="createGroup" @keydown.enter="createGroup"
             :disabled="group.name === '' || group.program === '' || group.cycle === ''">Crear</button>
     </form>
 </template>

@@ -4,8 +4,8 @@
       <h3>{{ title }}</h3>
       <p>{{ message }}</p>
       <div class="dialog-actions">
-        <button class="btn btn-confirm" @click="onConfirm">Confirmar</button>
-        <button class="btn btn-cancel" @click="onCancel">Cancelar</button>
+        <button class="btn btn-confirm" @click="onConfirm" @keydown.enter="onConfirm">Confirmar</button>
+        <button class="btn btn-cancel" @click="onCancel" @keydown.escape="onCancel">Cancelar</button>
       </div>
     </div>
   </div>

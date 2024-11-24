@@ -19,6 +19,7 @@ const cycles = ref([]);
 const weeks = ref([]);
 const groups = ref([]);
 const message = ref("");
+const messageType = ref("")
 const tableVisibility = ref(false);
 const emit = defineEmits('connected');
 
@@ -35,12 +36,26 @@ const newFilesName = reactive({
     files: [],
 });
 
+window.addEventListener("keydown", () => {
+    handleConnect();
+});
+
 async function connect() {
     try {
-        await CreateDB();
-        await initializeForms();
+        try {
+            await CreateDB();
+        } catch (error) {
+            message.value = `Error al crear la base de datos: ${error}`;
+        }
+        try {
+            await ListPrograms();
+        } catch (error) {
+            message.value = `Error al cargar los programas: ${error}`;
+        }
         connected.value = true;
         message.value = "Conexión exitosa";
+        messageType.value = "alert-success"
+
     } catch (error) {
         message.value = `Error al conectar con la base de datos: ${error}`;
     }
@@ -168,6 +183,11 @@ function sendLoadedState() {
     emit('connected', connected.value);
 }
 
+function handleConnect() {
+    connect();
+    sendLoadedState();
+}
+
 initializeForms();
 </script>
 
@@ -181,13 +201,11 @@ initializeForms();
 
         <div v-if="!connected || !contentLoaded" class="not-loaded">
             <main v-if="!connected" class="container">
-                <div class="message" v-if="!connected">
-                    <p>Al parecer no estás conectado a la base de datos, por favor, conectate para continuar.</p>
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    Al parecer no estás conectado a la base de datos, por favor, conectate para continuar.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <div class="message">
-                    <p>{{ message }}</p>
-                </div>
-                <button class="btn-connect" @click="() => { connect(); sendLoadedState(); }">Conectar</button>
+                <button class="btn-connect" @click="handleConnect">Conectar</button>
             </main>
             <footer>
                 <p>&copy; 2024 - CS50 Name Changer</p>
@@ -197,6 +215,10 @@ initializeForms();
         </div>
         <div v-else>
             <main class="main-container">
+                <div id="message" v-if="message" :class="['alert', messageType, 'alert-dismissible', 'fade', 'show']">
+                    {{ message }}
+                    <button type="button" class="btn-close" @click="message = ''" aria-label="Close"></button>
+                </div>
                 <div class="forms-container">
                     <div class="choices">
                         <div class="input-box">
@@ -322,13 +344,12 @@ initializeForms();
                                 </td>
                             </tr>
                         </tbody>
-
-                        <div class="actions">
-                            <button class="btn-change" @click="changeFileNames" v-if="newFilesName.name">
-                                Cambiar nombres
-                            </button>
-                        </div>
                     </table>
+                    <div class="actions">
+                        <button class="btn-change" @click="changeFileNames" v-if="newFilesName.name">
+                            Cambiar nombres
+                        </button>
+                    </div>
                 </div>
             </main>
             <footer>
@@ -392,8 +413,8 @@ header {
 
 
 
-.message {
-    color: red;
+#message {
+    text-align: start;
 }
 
 .main {
@@ -489,7 +510,7 @@ footer {
     gap: 1rem;
     background-color: #f8f9fa;
     flex-grow: 1;
-    width: 70vw;
+    width: 75vw;
     max-height: 90vh;
     overflow-y: auto;
     padding: 1rem;
