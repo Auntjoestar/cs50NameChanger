@@ -20,7 +20,7 @@ const weeks = ref([]);
 const groups = ref([]);
 const message = ref("");
 const messageType = ref("")
-const tableVisibility = ref(false);
+const tableVisibility = ref(true);
 const emit = defineEmits('connected');
 
 
@@ -327,7 +327,7 @@ initializeForms();
 
                 <div v-if="newFilesName.files.length > 0">
                     <h2>Archivos Seleccionados:</h2>
-                    <table>
+                    <table class="table table-striped" v-if="tableVisibility">
                         <thead>
                             <tr>
                                 <th>Nombre</th>
