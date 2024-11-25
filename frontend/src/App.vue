@@ -5,6 +5,22 @@ import Admin from './components/Admin.vue';
 import ToggleButton from './components/ToggleButton.vue';
 
 const showAdmin = ref(false);
+const buttonVisible = ref(false);
+
+window.addEventListener('beforeunload', () => {
+  localStorage.clear();
+});
+
+window.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.key === 'a') {
+    toggleAdminView();
+  }
+});
+
+function showButton() {
+  buttonVisible.value = true;
+}
+
 
 onMounted(() => {
   const savedState = localStorage.getItem('showAdmin');
@@ -24,10 +40,10 @@ window.addEventListener('beforeunload', () => {
 <template>
   <div class="main-container">
     <Admin v-if="showAdmin" />
-    <Forms v-else />
+    <Forms  @connected="showButton" v-else />
 
     <!-- Circular Toggle Button -->
-    <ToggleButton @toggle="toggleAdminView" :element="showAdmin ? 'fa-image' : 'fa-database'" />
+    <ToggleButton @toggle="toggleAdminView" :element="showAdmin ? 'fa-image' : 'fa-database'" v-if="buttonVisible" />
   </div>
 </template>
 

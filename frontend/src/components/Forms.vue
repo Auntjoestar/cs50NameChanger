@@ -36,21 +36,42 @@ const newFilesName = reactive({
     files: [],
 });
 
-window.addEventListener("keydown", () => {
-    handleConnect();
+window.addEventListener("keydown", (e) => {
+    switch (connected.value) {
+        case true:
+            if (e.key === "Enter") {
+                if (newFilesName.name) {
+                    changeFileNames();
+                }
+            }
+            if (e.ctrlKey && e.key === "r") {
+                initializeForms();
+            }
+            break;
+        case false:
+            if (e.key === "Enter") {
+                handleConnect();
+            }
+            break;
+    }
 });
 
+
+
+window.addEventListener
 async function connect() {
     try {
         try {
             await CreateDB();
         } catch (error) {
             message.value = `Error al crear la base de datos: ${error}`;
+            messageType.value = "alert-danger";
         }
         try {
             await ListPrograms();
         } catch (error) {
             message.value = `Error al cargar los programas: ${error}`;
+            messageType.value = "alert-danger";
         }
         connected.value = true;
         message.value = "Conexión exitosa";
@@ -58,6 +79,7 @@ async function connect() {
 
     } catch (error) {
         message.value = `Error al conectar con la base de datos: ${error}`;
+        messageType.value = "alert-danger";
     }
 }
 
@@ -75,6 +97,7 @@ async function listCycles() {
         cycles.value = result;
     } catch (error) {
         message.value = `Error al cargar los ciclos: ${error}`;
+        messageType.value = "alert-danger";
     }
 }
 
@@ -92,6 +115,7 @@ async function listWeeks() {
         weeks.value = result;
     } catch (error) {
         message.value = `Error al cargar las semanas: ${error}`;
+        messageType.value = "alert-danger";
     }
 }
 
@@ -109,6 +133,7 @@ async function listGroups() {
         groups.value = result;
     } catch (error) {
         message.value = `Error al cargar los grupos: ${error}`;
+        messageType.value = "alert-danger";
     }
 }
 
@@ -124,8 +149,11 @@ async function initializeForms() {
         if (!contentLoaded.value) {
             contentLoaded.value = true;
         }
+        message.value = "Datos cargados";
+        messageType.value = "alert-success";
     } catch (error) {
         message.value = `Error al cargar los datos: ${error.message}`;
+        messageType.value = "alert-danger";
     }
 }
 
@@ -135,6 +163,7 @@ async function selectFiles() {
         newFilesName.files = result;
     } catch (error) {
         message.value = error;
+        messageType.value = "alert-danger";
     }
 }
 
@@ -144,6 +173,7 @@ async function addFiles() {
         newFilesName.files = [...newFilesName.files, ...result];
     } catch (error) {
         message.value = error;
+        messageType.value = "alert-danger";
     }
 }
 
@@ -158,6 +188,7 @@ function changeFileNames() {
     ChangeFileNames(newFilesName.files, newFilesName.name)
         .then(result => {
             message.value = result;
+            messageType.value = "alert-success";
             for (let key in newFilesName) {
                 if (key != 'files') {
                     newFilesName[key] = "";
@@ -168,6 +199,7 @@ function changeFileNames() {
         })
         .catch(error => {
             message.value = error;
+            messageType.value = "alert-danger";
         });
 }
 
@@ -327,7 +359,7 @@ initializeForms();
 
                 <div v-if="newFilesName.files.length > 0">
                     <h2>Archivos Seleccionados:</h2>
-                    <table class="table table-striped" v-if="tableVisibility">
+                    <table class="custom-table" v-if="tableVisibility">
                         <thead>
                             <tr>
                                 <th>Nombre</th>
@@ -523,5 +555,37 @@ footer {
 
 .name-para {
     margin-top: 1rem;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+
+    th,
+    td {
+        padding: 12px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-top: none;
+
+    }
+
+    th {
+        top: 0;
+        border-top: none;
+    }
+
+    thead th {
+        background-color: #343a40;
+        color: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    tbody tr:hover {
+        background-color: #f1f1f1;
+    }
 }
 </style>
