@@ -557,11 +557,13 @@ func (a *App) WatchWeeks() []models.WeeksResponse {
 	for _, week := range weeks {
 		var cycle models.Cycle
 		db.First(&cycle, "id = ?", week.CycleID)
+		var program models.Program
+		db.First(&program, "id = ?", cycle.ProgramID)
 		weeksResponse = append(weeksResponse, models.WeeksResponse{
 			ID:        week.ID,
 			Name:      week.Name,
 			CycleID:   week.CycleID,
-			CycleName: cycle.Name,
+			CycleName: fmt.Sprintf("%s (%s)", cycle.Name, program.Name),
 		})
 	}
 	return weeksResponse
@@ -581,11 +583,13 @@ func (a *App) WatchGroups() []models.GroupsResponse {
 	for _, group := range groups {
 		var cycle models.Cycle
 		db.First(&cycle, "id = ?", group.CycleID)
+		var program models.Program
+		db.First(&program, "id = ?", cycle.ProgramID)
 		groupsResponse = append(groupsResponse, models.GroupsResponse{
 			ID:        group.ID,
 			Name:      group.Name,
 			CycleID:   group.CycleID,
-			CycleName: cycle.Name,
+			CycleName: fmt.Sprintf("%s (%s)", cycle.Name, program.Name),
 		})
 	}
 	return groupsResponse
