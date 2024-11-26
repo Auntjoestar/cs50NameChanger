@@ -12,7 +12,7 @@ window.addEventListener('beforeunload', () => {
 });
 
 window.addEventListener('keydown', (e) => {
-  if (e.ctrlKey && e.key === 'a') {
+  if (e.ctrlKey && e.shiftKey && e.key === 'A') {
     toggleAdminView();
   }
 });
@@ -54,11 +54,19 @@ html {
 
 body {
   background-color: #f8f9fa !important;
+  overflow: hidden;
 }
 
 .main-container {
   position: relative;
   background-color: #f8f9fa;
+}
+
+
+@media (max-width: 768px) {
+  body {
+    overflow: auto;
+  }
 }
 
 </style>

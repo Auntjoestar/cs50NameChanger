@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, defineEmits } from 'vue';
 import { ListPrograms, ListCycles, CreateGroup } from '../../wailsjs/go/main/App';
 
 const programs = ref([]);
@@ -9,6 +9,13 @@ const group = ref({
     name: "",
     cycle: "",
 })
+const emit = defineEmits('group-created', 'error');
+
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && group.value.name !== '' && group.value.program !== '' && group.value.cycle !== '') {
+        createGroup();
+    }
+});
 
 async function listPrograms() {
     const response = await ListPrograms();
@@ -25,11 +32,19 @@ async function listCycles() {
 }
 
 async function createGroup() {
-    await CreateGroup(group.value.name, group.value.cycle);
-    group.value = {
-        name: "",
-        cycle: "",
-        program: "",
+    try {
+        const result = await CreateGroup(group.value.name, group.value.cycle);
+        group.value = {
+            program: "",
+            name: "",
+            cycle: "",
+        };
+        emit('group-created');
+    } catch (error) {
+        if (typeof error === 'string') {
+            error = error.charAt(0).toUpperCase() + error.slice(1);
+        }
+        emit('error', error);
     }
 }
 
@@ -37,7 +52,7 @@ listPrograms();
 </script>
 
 <template>
-    <form>
+    <form @submit.prevent="createGroup" @keydown.enter="createGroup">
         <h2 class="form-title">Crear Grupo</h2>
         <input type="text" v-model="group.name" placeholder="Grupo" class="form-control" />
         <select v-model="group.program" @change="listCycles" class="form-control form-select">

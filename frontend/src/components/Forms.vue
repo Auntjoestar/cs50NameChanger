@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, defineEmits } from 'vue';
+import { ref, reactive, defineEmits, onMounted, onBeforeUnmount } from 'vue';
 import {
     CreateDB,
     ListPrograms,
@@ -11,7 +11,6 @@ import {
     ChangeFileNames
 } from '../../wailsjs/go/main/App';
 
-
 const connected = ref(false);
 const contentLoaded = ref(false);
 const programs = ref([]);
@@ -19,10 +18,9 @@ const cycles = ref([]);
 const weeks = ref([]);
 const groups = ref([]);
 const message = ref("");
-const messageType = ref("")
+const messageType = ref("");
 const tableVisibility = ref(true);
 const emit = defineEmits('connected');
-
 
 localStorage.getItem('connected') ? connected.value = true : connected.value = false;
 localStorage.setItem('connected', connected.value);
@@ -36,29 +34,66 @@ const newFilesName = reactive({
     files: [],
 });
 
-window.addEventListener("keydown", (e) => {
-    switch (connected.value) {
-        case true:
-            if (e.key === "Enter") {
-                if (newFilesName.name) {
+function keydownConnect(e) {
+    let shouldPreventDefault = false;
+
+    switch (e.key) {
+        case "Enter":
+            if (newFilesName.name) {
+                if (newFilesName.files.length > 0) {
                     changeFileNames();
+                    shouldPreventDefault = true;
                 }
             }
-            if (e.ctrlKey && e.key === "r") {
+            break;
+        case "r":
+            if (e.ctrlKey) {
                 initializeForms();
+                shouldPreventDefault = true;
             }
             break;
-        case false:
-            if (e.key === "Enter") {
-                handleConnect();
+        case "a":
+            if ((e.ctrlKey || e.metaKey) && newFilesName.files.length > 0) {
+                addFiles();
+                shouldPreventDefault = true;
             }
+            break;
+        case "s":
+            if (e.ctrlKey) {
+                selectFiles();
+                shouldPreventDefault = true;
+            }
+            break;
+        default:
             break;
     }
-});
 
+    if (shouldPreventDefault) {
+        e.preventDefault();
+    }
+}
 
+function connectEventListeners() {
+    const handleKeydown = (e) => {
+        switch (connected.value) {
+            case true:
+                keydownConnect(e);
+                break;
+            case false:
+                if (e.key === "Enter") {
+                    handleConnect();
+                }
+                break;
+        }
+    };
 
-window.addEventListener
+    window.addEventListener("keydown", handleKeydown);
+
+    onBeforeUnmount(() => {
+        window.removeEventListener("keydown", handleKeydown);
+    });
+}
+
 async function connect() {
     try {
         try {
@@ -75,8 +110,7 @@ async function connect() {
         }
         connected.value = true;
         message.value = "Conexión exitosa";
-        messageType.value = "alert-success"
-
+        messageType.value = "alert-success";
     } catch (error) {
         message.value = `Error al conectar con la base de datos: ${error}`;
         messageType.value = "alert-danger";
@@ -160,6 +194,9 @@ async function initializeForms() {
 async function selectFiles() {
     try {
         const result = await OpenFileDialog();
+        if (result === null) {
+            return;
+        }
         newFilesName.files = result;
     } catch (error) {
         message.value = error;
@@ -170,41 +207,40 @@ async function selectFiles() {
 async function addFiles() {
     try {
         const result = await OpenFileDialog();
-        newFilesName.files = [...newFilesName.files, ...result];
+        if (result === null) {
+            return;
+        }
+        newFilesName.files = [...newFilesName.files, ...result.filter(f => !newFilesName.files.includes(f))];
     } catch (error) {
         message.value = error;
         messageType.value = "alert-danger";
     }
 }
 
-function makeNewName() {
-    MakeNewName(newFilesName.program, newFilesName.cycle, newFilesName.week, newFilesName.group)
-        .then(result => {
-            newFilesName.name = result;
-        });
+async function makeNewName() {
+    try {
+        newFilesName.name = await MakeNewName(newFilesName.program, newFilesName.cycle, newFilesName.week, newFilesName.group);
+    } catch (error) {
+        message.value = error;
+        messageType.value = "alert-danger";
+    }
 }
 
 function changeFileNames() {
-    ChangeFileNames(newFilesName.files, newFilesName.name)
-        .then(result => {
-            message.value = result;
-            messageType.value = "alert-success";
-            for (let key in newFilesName) {
-                if (key != 'files') {
-                    newFilesName[key] = "";
-                    continue;
-                }
-                newFilesName[key] = [];
-            }
-        })
-        .catch(error => {
-            message.value = error;
-            messageType.value = "alert-danger";
-        });
+    try {
+        ChangeFileNames(newFilesName.files, newFilesName.name);
+        newFilesName.files = [];
+        message.value = "Nombres cambiados";
+        messageType.value = "alert-success";
+    } catch (error) {
+        message.value = error;
+        messageType.value = "alert-danger";
+    }
 }
 
 function toggleTableVisibility() {
     tableVisibility.value = !tableVisibility.value;
+    document.querySelector('.custom-table').classList.toggle('collapsed');
 }
 
 function unselectFile(file) {
@@ -220,8 +256,34 @@ function handleConnect() {
     sendLoadedState();
 }
 
-initializeForms();
+function handleProgramChange() {
+    document.getElementById("cycles-options").selectedIndex = 0;
+    document.getElementById("weeks-options").selectedIndex = 0;
+    document.getElementById("groups-options").selectedIndex = 0;
+    newFilesName.name = "";
+    newFilesName.cycle = "";
+    newFilesName.week = "";
+    newFilesName.group = "";
+    listCycles();
+    makeNewName();
+};
+
+function handleCycleChange() {
+    document.getElementById("weeks-options").selectedIndex = 0;
+    document.getElementById("groups-options").selectedIndex = 0;
+    newFilesName.week = "";
+    newFilesName.group = "";
+    listWeeks();
+    listGroups();
+    makeNewName();
+};
+
+onMounted(() => {
+    connectEventListeners();
+    initializeForms();
+});
 </script>
+
 
 <template>
     <div class="layout-container">
@@ -245,18 +307,19 @@ initializeForms();
             <button class="btn-load" @click="initializeForms" v-if="connected" v-show="!contentLoaded">Cargar
                 datos</button>
         </div>
-        <div v-else>
+        <div class="layout-container-2" v-else>
             <main class="main-container">
-                <div id="message" v-if="message" :class="['alert', messageType, 'alert-dismissible', 'fade', 'show']">
-                    {{ message }}
-                    <button type="button" class="btn-close" @click="message = ''" aria-label="Close"></button>
-                </div>
                 <div class="forms-container">
                     <div class="choices">
+                        <div id="message" v-if="message"
+                            :class="['alert', messageType, 'alert-dismissible', 'fade', 'show']">
+                            {{ message }}
+                            <button type="button" class="btn-close" @click="message = ''" aria-label="Close"></button>
+                        </div>
                         <div class="input-box">
                             <label for="programs-options">Escoge el programa: </label>
                             <select id="programs-options" autocomplete="off" class="input" type="text"
-                                v-model="newFilesName.program" @change="(event) => { listCycles(); makeNewName(); }">
+                                v-model="newFilesName.program" @change="handleProgramChange">
                                 <option value="" disabled selected v-if="programs.length == 0">Cargando programas...
                                 </option>
                                 <option value="" disabled selected v-if="programs[0] == 'No hay programas'">No hay
@@ -272,8 +335,7 @@ initializeForms();
                         <div class="input-box">
                             <label for="cycles-options">Escoge el ciclo: </label>
                             <select id="cycles-options" autocomplete="off" class="input" type="text"
-                                v-model="newFilesName.cycle"
-                                @change="(event) => { listWeeks(); listGroups(); makeNewName(); }"
+                                v-model="newFilesName.cycle" @change="handleCycleChange"
                                 v-if="cycles[0] != 'No hay ciclos' && newFilesName.program != ''">
                                 <option value="" disabled selected v-if="cycles.length == 0">Cargando ciclos...</option>
                                 <option value="" disabled selected v-else>Selecciona un ciclo</option>
@@ -316,7 +378,7 @@ initializeForms();
                             <label for="groups-options">Escoge el grupo: </label>
                             <select id="groups-options" autocomplete="off" class="input" type="text"
                                 v-model="newFilesName.group" @change="makeNewName"
-                                v-if="groups[0] != 'No hay grupos' && weeks[0] != 'No hay semanas' && cycles[0] != 'No hay ciclos'">
+                                v-if="groups[0] != 'No hay grupos' && cycles[0] != 'No hay ciclos' && newFilesName.cycle != ''">
                                 <option value="" disabled selected v-if="groups.length == 0">Cargando grupos...</option>
                                 <option value="" disabled selected v-else>Selecciona un grupo</option>
                                 <option v-for="(group, index) in groups" :key="index">
@@ -325,7 +387,7 @@ initializeForms();
                             </select>
                             <select id="groups-options" autocomplete="off" class="input" type="text"
                                 v-model="newFilesName.group" disabled v-else-if="newFilesName.week == ''">
-                                <option value="" disabled selected>Selecciona una semana</option>
+                                <option value="" disabled selected>Selecciona un ciclo</option>
                             </select>
                             <select id="groups-options" autocomplete="off" class="input" type="text"
                                 v-model="newFilesName.group" disabled v-else>
@@ -357,8 +419,11 @@ initializeForms();
                     </button>
                 </div>
 
-                <div v-if="newFilesName.files.length > 0">
+                <div v-if="newFilesName.files.length > 0" class="table-container">
                     <h2>Archivos Seleccionados:</h2>
+                    <button class="btn-change-visbility btn btn-primary" @click="toggleTableVisibility">
+                        <i class="fas fa-eye"></i>
+                    </button>
                     <table class="custom-table" v-if="tableVisibility">
                         <thead>
                             <tr>
@@ -378,7 +443,8 @@ initializeForms();
                         </tbody>
                     </table>
                     <div class="actions">
-                        <button class="btn-change" @click="changeFileNames" v-if="newFilesName.name">
+                        <button class="btn-change" @click="changeFileNames"
+                            :disabled="!newFilesName.name || newFilesName.name == 'Nombre del archivo'">
                             Cambiar nombres
                         </button>
                     </div>
@@ -499,6 +565,15 @@ header {
     transition: background-color 0.3s;
 }
 
+.btn-change:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-change:disabled:hover {
+    background-color: #ccc;
+}
+
 .btn-select:hover,
 .btn-add:hover,
 .btn-remove:hover,
@@ -561,6 +636,8 @@ footer {
     width: 100%;
     border-collapse: collapse;
     font-family: Arial, sans-serif;
+    transition: max-height 0.5s ease-in-out;
+    max-height: 1000px;
 
     th,
     td {
@@ -568,7 +645,8 @@ footer {
         text-align: center;
         border: 1px solid #ddd;
         border-top: none;
-
+        text-align: left;
+        text-wrap: normal;
     }
 
     th {
@@ -587,5 +665,157 @@ footer {
     tbody tr:hover {
         background-color: #f1f1f1;
     }
+
+    margin-bottom: 1rem;
+}
+
+.custom-table.collapsed {
+    max-height: 0;
+}
+
+.btn-change-visbility {
+    width: fit-content;
+    background-color: transparent;
+    border: none;
+    color: #007bff;
+    margin-right: 100%;
+}
+
+
+
+
+.layout-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 1rem;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 200px;
+    /* Fixed width to keep the sidebar size consistent */
+    height: 100vh;
+    background-color: #333;
+    padding-top: 20px;
+    color: white;
+    text-align: center;
+    overflow-y: auto;
+    flex-shrink: 0;
+    /* Prevent shrinking of the sidebar */
+}
+
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background-color: #f8f9fa;
+    flex-grow: 1;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 1rem;
+    margin: auto;
+}
+
+.layout-container-2 {
+    width: 100%;
+}
+
+.table-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+
+    .layout-container {
+        flex-direction: column;
+        /* Stack elements vertically on smaller screens */
+    }
+
+    .sidebar {
+        width: 100%;
+        /* Full-width for mobile */
+        height: auto;
+        padding: 10px;
+    }
+
+    .main-container {
+        /* 75% width for better readability */
+        max-height: none;
+        /* Remove max-height for better responsiveness */
+    }
+
+    .name-para {
+        margin-top: 1rem;
+    }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+        transition: max-height 0.5s ease-in-out;
+        max-height: 1000px;
+        margin-bottom: 1rem;
+    }
+
+    .custom-table th,
+    .custom-table td {
+        padding: 12px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-top: none;
+        text-align: left;
+        word-wrap: break-word;
+        word-break: break-word;
+        /* Allows text to wrap inside cells */
+    }
+
+    .custom-table th {
+        top: 0;
+        border-top: none;
+    }
+
+    .custom-table thead th {
+        background-color: #343a40;
+        color: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .custom-table tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* Make the table scrollable horizontally on small screens */
+    @media screen and (max-width: 768px) {
+        .custom-table {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            /* Smooth scrolling on iOS */
+        }
+
+        .custom-table th,
+        .custom-table td {
+            padding: 8px;
+            /* Reduced padding on smaller screens */
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+
+        .custom-table th,
+        .custom-table td {
+            font-size: 12px;
+            /* Smaller font size for very small screens */
+        }
+    }
+
 }
 </style>

@@ -1,24 +1,30 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, defineEmits } from 'vue';
 import {
     CreateProgram,
-    ListPrograms
 } from '../../wailsjs/go/main/App';
 
 const program = ref("");
+const emit = defineEmits('program-created', 'error');
 
 async function createProgram() {
-    await CreateProgram(program.value);
-    program.value = "";
+    try {
+        const result = await CreateProgram(program.value);
+        program.value = "";
+        emit('program-created');
+    } catch (error) {
+        error = error.charAt(0).toUpperCase() + error.slice(1);
+        emit('error', error);
+    }
 }
 
 </script>
 
 <template>
-    <form>
+    <form @submit.prevent="createProgram" @keydown.enter="createProgram">
         <h2 class="form-title">Crear Programa</h2>
         <input type="text" v-model="program" placeholder="Programa" class="form-control" />
-        <button type="button" class="btn btn-dark" @click="createProgram" :disabled="program === ''">Crear</button>
+        <button type="button" class="btn btn-dark" :disabled="program === ''" @click="createProgram">Crear</button>
     </form>
 </template>
 

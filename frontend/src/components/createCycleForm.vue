@@ -1,9 +1,10 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, defineEmits } from 'vue'
 import { ListPrograms, CreateCycle } from '../../wailsjs/go/main/App';
 
 
 const programs = ref([]);
+const emit = defineEmits('cycle-created', 'error');
 
 const cycle = ref({
     name: "",
@@ -16,10 +17,15 @@ async function listPrograms() {
 }
 
 async function createCycle() {
-    await CreateCycle(cycle.value.name, cycle.value.program);
-    cycle.value = {
-        name: "",
-        program: "",
+    try {
+        const result = await CreateCycle(cycle.value.name, cycle.value.program);
+        console.log(result);
+        cycle.value.name = "";
+        cycle.value.program = "";
+        emit('cycle-created');
+    } catch (error) {
+        error = error.charAt(0).toUpperCase() + error.slice(1);
+        emit('error', error || "Error al crear el ciclo");
     }
 }
 
@@ -27,7 +33,7 @@ listPrograms();
 </script>
 
 <template>
-    <form>
+    <form @submit.prevent="createCycle" @keydown.enter="createCycle">
         <h2 class="form-title">Crear Ciclo</h2>
         <input type="text" v-model="cycle.name" placeholder="Ciclo" class="form-control" />
         <select v-model="cycle.program" placeholder="Programa" class="form-control form-select">

@@ -1,36 +1,29 @@
 <template>
   <div class="dialog-overlay" @click.self="onCancel">
     <div class="dialog-content">
-      <h3>{{ title }}</h3>
-      <p>{{ message }}</p>
+      <slot>
+        <h3>{{ title }}</h3>
+        <p>{{ message }}</p>
+      </slot>
       <div class="dialog-actions">
-        <button class="btn btn-confirm" @click="onConfirm">Confirmar</button>
+        <button ref="confirmButtonRef" class="btn btn-confirm" @click="onConfirm">Confirmar</button>
         <button class="btn btn-cancel" @click="onCancel">Cancelar</button>
       </div>
     </div>
   </div>
 </template>
 
+
 <script setup>
-import { defineProps, defineEmits } from 'vue';
+import { defineProps, defineEmits, ref, onMounted, onUnmounted } from 'vue';
 
 const props = defineProps({
   title: String,
   message: String,
 });
+
 const emit = defineEmits(['confirm', 'cancel']);
-
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    onCancel();
-  }
-});
-
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    onConfirm();
-  }
-});
+const confirmButtonRef = ref(null);
 
 function onConfirm() {
   emit('confirm');
@@ -39,7 +32,23 @@ function onConfirm() {
 function onCancel() {
   emit('cancel');
 }
+
+function onKeyDown(event) {
+  if (event.key === 'Escape') {
+    onCancel();
+  }
+}
+
+onMounted(() => {
+  confirmButtonRef.value?.focus();
+  window.addEventListener('keydown', onKeyDown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeyDown);
+});
 </script>
+
 
 <style scoped>
 .dialog-overlay {

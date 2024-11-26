@@ -1,14 +1,14 @@
 <script setup>
-import { reactive, onMounted, onUnmounted } from 'vue';
+import { reactive, onMounted, onUnmounted, ref } from 'vue';
 
 import Create from './Create.vue';
 import Display from './Display.vue';
+
 
 const view = reactive({
     create: false,
     display: true,
 });
-
 
 onMounted(() => {
     document.body.style.overflow = 'hidden'; 

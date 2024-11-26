@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"cs50NameChanger/models"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -175,115 +176,145 @@ func (a *App) executeInTransaction(fn func(*gorm.DB) error) error {
 }
 
 func (a *App) CreateProgram(name string) error {
-	a.executeInTransaction(func(tx *gorm.DB) error {
-		var count int64
-		err := tx.Table("programs").Where("UPPER(name) = ?", strings.ToUpper(name)).Count(&count).Error
-		if err != nil {
-			return err
-		}
-		if count > 0 {
+	return a.executeInTransaction(func(tx *gorm.DB) error {
+		// Check for duplicate programs
+		var existingProgram models.Program
+		if err := tx.Where("UPPER(name) = ?", strings.ToUpper(name)).First(&existingProgram).Error; err == nil {
 			return fmt.Errorf("el programa %s ya existe", name)
-		}
-		program := models.Program{Name: name}
-		err = tx.Create(&program).Error
-		if err != nil {
+		} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
-		tx.Create(&models.ProgramsResponse{
+
+		program := models.Program{Name: name}
+		if err := tx.Create(&program).Error; err != nil {
+			return err
+		}
+
+		programResponse := models.ProgramsResponse{
 			ID:   program.ID,
 			Name: program.Name,
-		})
+		}
+		if err := tx.Create(&programResponse).Error; err != nil {
+			return err
+		}
+
 		return nil
-	},
-	)
-	return nil
+	})
 }
 
 func (a *App) CreateCycle(name string, program string) error {
-	a.executeInTransaction(func(tx *gorm.DB) error {
-		var count int64
-		err := tx.Table("cycles").Where("UPPER(name) = ? AND program_id = ?", strings.ToUpper(name), program).Count(&count).Error
-		if err != nil {
-			return err
-		}
-		if count > 0 {
-			return fmt.Errorf("el ciclo %s ya existe", name)
-		}
+	return a.executeInTransaction(func(tx *gorm.DB) error {
+		// Check if the program exists
 		var programDB models.Program
-		tx.First(&programDB, "name = ?", program)
-		cycle := models.Cycle{Name: name, ProgramID: programDB.ID}
-		err = tx.Create(&cycle).Error
-		if err != nil {
+		if err := tx.First(&programDB, "name = ?", program).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return fmt.Errorf("el programa %s no existe", program)
+			}
 			return err
 		}
-		tx.Create(&models.CyclesResponse{
+
+		// Ensure the cycle doesn't already exist
+		var cycle models.Cycle
+		if err := tx.Where("UPPER(name) = ? AND program_id = ?", strings.ToUpper(name), programDB.ID).
+			First(&cycle).Error; err == nil {
+			return fmt.Errorf("el ciclo %s ya existe", name)
+		} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err // Return any other errors
+		}
+
+		// Create the cycle
+		cycle = models.Cycle{Name: name, ProgramID: programDB.ID}
+		if err := tx.Create(&cycle).Error; err != nil {
+			return err
+		}
+
+		// Create the CyclesResponse
+		cycleResponse := models.CyclesResponse{
 			ID:          cycle.ID,
 			Name:        cycle.Name,
 			ProgramID:   cycle.ProgramID,
 			ProgramName: program,
-		})
+		}
+		if err := tx.Create(&cycleResponse).Error; err != nil {
+			return err
+		}
+
 		return nil
-	},
-	)
-	return nil
+	})
 }
 
 func (a *App) CreateWeek(name string, cycle string) error {
-	a.executeInTransaction(func(tx *gorm.DB) error {
-		var count int64
-		err := tx.Table("weeks").Where("UPPER(name) = ? AND cycle_id = ?", strings.ToUpper(name), cycle).Count(&count).Error
-		if err != nil {
-			return err
-		}
-		if count > 0 {
-			return fmt.Errorf("la semana %s ya existe", name)
-		}
+	return a.executeInTransaction(func(tx *gorm.DB) error {
 		var cycleDB models.Cycle
-		tx.First(&cycleDB, "name = ?", cycle)
-		week := models.Week{Name: name, CycleID: cycleDB.ID}
-		err = tx.Create(&week).Error
-		if err != nil {
+		if err := tx.Where("name = ?", cycle).First(&cycleDB).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return fmt.Errorf("el ciclo %s no existe", cycle)
+			}
 			return err
 		}
-		tx.Create(&models.WeeksResponse{
+
+		var existingWeek models.Week
+		if err := tx.Where("UPPER(name) = ? AND cycle_id = ?", strings.ToUpper(name), cycleDB.ID).First(&existingWeek).Error; err == nil {
+			return fmt.Errorf("la semana %s ya existe", name)
+		} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
+
+		week := models.Week{Name: name, CycleID: cycleDB.ID}
+		if err := tx.Create(&week).Error; err != nil {
+			return err
+		}
+
+		weekResponse := models.WeeksResponse{
 			ID:        week.ID,
 			Name:      week.Name,
 			CycleID:   week.CycleID,
 			CycleName: cycle,
-		})
+		}
+		if err := tx.Create(&weekResponse).Error; err != nil {
+			return err
+		}
+
 		return nil
-	},
-	)
-	return nil
+	})
 }
 
 func (a *App) CreateGroup(name string, cycle string) error {
-	a.executeInTransaction(func(tx *gorm.DB) error {
-		var count int64
-		err := tx.Table("groups").Where("UPPER(name) = ? AND cycle_id = ?", strings.ToUpper(name), cycle).Count(&count).Error
-		if err != nil {
-			return err
-		}
-		if count > 0 {
-			return fmt.Errorf("el grupo %s ya existe", name)
-		}
+
+	return a.executeInTransaction(func(tx *gorm.DB) error {
 		var cycleDB models.Cycle
-		tx.First(&cycleDB, "name = ?", cycle)
-		group := models.Group{Name: name, CycleID: cycleDB.ID}
-		err = tx.Create(&group).Error
-		if err != nil {
+		if err := tx.Where("name = ?", cycle).First(&cycleDB).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return fmt.Errorf("el ciclo %s no existe", cycle)
+			}
 			return err
 		}
-		tx.Create(&models.GroupsResponse{
+
+		var existingGroup models.Group
+		if err := tx.Where("UPPER(name) = ? AND cycle_id = ?", strings.ToUpper(name), cycleDB.ID).First(&existingGroup).Error; err == nil {
+			return fmt.Errorf("el grupo %s ya existe", name)
+		} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
+
+		group := models.Group{Name: name, CycleID: cycleDB.ID}
+		if err := tx.Create(&group).Error; err != nil {
+			return err
+		}
+
+		// Create the GroupsResponse
+		groupResponse := models.GroupsResponse{
 			ID:        group.ID,
 			Name:      group.Name,
 			CycleID:   group.CycleID,
 			CycleName: cycle,
-		})
+		}
+		if err := tx.Create(&groupResponse).Error; err != nil {
+			return err
+		}
+
 		return nil
-	},
-	)
-	return nil
+	})
 }
 
 func (a *App) DeleteProgram(id int) error {
@@ -407,6 +438,9 @@ func (a *App) OpenFileDialog() ([]string, error) {
 	})
 	if err != nil {
 		return nil, err
+	}
+	if len(filepath) == 0 {
+		return nil, nil
 	}
 	return filepath, nil
 }

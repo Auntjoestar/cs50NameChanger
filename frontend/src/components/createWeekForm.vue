@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, defineEmits } from 'vue';
 import { ListPrograms, ListCycles, CreateWeek } from '../../wailsjs/go/main/App';
 
 const programs = ref([]);
@@ -9,6 +9,13 @@ const week = ref({
     name: "",
     cycle: "",
 })
+const emit = defineEmits('week-created', 'error');
+
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && week.value.name !== '' && week.value.program !== '' && week.value.cycle !== '') {
+        createWeek();
+    }
+});
 
 async function listPrograms() {
     const response = await ListPrograms();
@@ -25,11 +32,19 @@ async function listCycles() {
 }
 
 async function createWeek() {
-    await CreateWeek(week.value.name, week.value.cycle);
-    week.value = {
-        name: "",
-        cycle: "",
-        program: "",
+    try {
+        const result = await CreateWeek(week.value.name, week.value.cycle);
+        week.value = {
+            program: "",
+            name: "",
+            cycle: "",
+        };
+        emit('week-created');
+    } catch (error) {
+        if (typeof error === 'string') {
+            error = error.charAt(0).toUpperCase() + error.slice(1);
+        }
+        emit('error', error);
     }
 }
 
@@ -37,7 +52,7 @@ listPrograms();
 </script>
 
 <template>
-    <form>
+    <form @submit.prevent="createWeek" @keydown.enter="createWeek">
         <h2 class="form-title">Crear Semana</h2>
         <input type="text" v-model="week.name" placeholder="Semana" class="form-control" />
         <select v-model="week.program" @change="listCycles" class="form-control form-select" placeholder="Programa">
