@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineEmits } from 'vue';
+import { ref, defineEmits, onMounted, onUnmounted } from 'vue';
 import { ListPrograms, ListCycles, CreateWeek } from '../../wailsjs/go/main/App';
 
 const programs = ref([]);
@@ -11,10 +11,24 @@ const week = ref({
 })
 const emit = defineEmits('week-created', 'error');
 
-window.addEventListener('keydown', (e) => {
+const handleEnter = (e) => {
     if (e.key === 'Enter' && week.value.name !== '' && week.value.program !== '' && week.value.cycle !== '') {
         createWeek();
     }
+}
+
+onMounted(() => {
+    window.addEventListener('keydown', handleEnter);
+
+});
+
+onUnmounted(() => {
+    window.removeEventListener('keydown', handleEnter);
+    week.value = {
+        program: "",
+        name: "",
+        cycle: "",
+    };
 });
 
 async function listPrograms() {
@@ -29,6 +43,9 @@ async function listCycles() {
         return;
     }
     cycles.value = response;
+
+    const cycleSelect = document.querySelectorAll('.form-select')[1];
+    cycleSelect.selectedIndex = 0;
 }
 
 async function createWeek() {
@@ -48,6 +65,13 @@ async function createWeek() {
     }
 }
 
+function handleProgramChange() {
+    week.value.cycle = "";
+    week.value.name = "";
+
+    listCycles();
+}
+
 listPrograms();
 </script>
 
@@ -55,15 +79,23 @@ listPrograms();
     <form @submit.prevent="createWeek" @keydown.enter="createWeek">
         <h2 class="form-title">Crear Semana</h2>
         <input type="text" v-model="week.name" placeholder="Semana" class="form-control" />
-        <select v-model="week.program" @change="listCycles" class="form-control form-select" placeholder="Programa">
+        <select v-model="week.program" @change="handleProgramChange" class="form-control form-select"
+            placeholder="Programa">
             <option value="" disabled>Selecciona un programa</option>
             <option v-if="programs[0] === 'No hay programas'" :value="programs[0]" disabled>{{ programs[0] }}</option>
             <option v-else v-for="(program, index) in programs" :key="index">{{ program }}</option>
         </select>
-        <select v-model="week.cycle" placeholder="Ciclo" class="form-control form-select">
+        <select v-model="week.cycle" placeholder="Ciclo" class="form-control form-select" v-if="week.program && cycles[0] !== 'No hay ciclos'">
             <option value="" disabled>Selecciona un ciclo</option>
             <option v-if="cycles[0] === 'No hay ciclos'" :value="cycles[0]" disabled>{{ cycles[0] }}</option>
             <option v-else v-for="(cycle, index) in cycles" :key="index">{{ cycle }}</option>
+        </select>
+        <select v-else-if="week.program && cycles[0] === 'No hay ciclos'"
+            class="form-control form-select" disabled>
+            <option value="" disabled selected>No hay ciclos</option>
+        </select>
+        <select placeholder="Ciclo" class="form-control form-select" v-else>
+            <option value="" disabled selected>Selecciona un programa primero</option>
         </select>
         <button type="button" class="btn btn-dark" @click="createWeek"
             :disabled="week.name === '' || week.program === '' || week.cycle === ''">Crear</button>

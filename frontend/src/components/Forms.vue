@@ -20,7 +20,7 @@ const groups = ref([]);
 const message = ref("");
 const messageType = ref("");
 const tableVisibility = ref(true);
-const emit = defineEmits('connected');
+const emit = defineEmits(['connected']);
 
 localStorage.getItem('connected') ? connected.value = true : connected.value = false;
 localStorage.setItem('connected', connected.value);
@@ -318,7 +318,7 @@ onMounted(() => {
                         </div>
                         <div class="input-box">
                             <label for="programs-options">Escoge el programa: </label>
-                            <select id="programs-options" autocomplete="off" class="input" type="text"
+                            <select id="programs-options" autocomplete="off" class="input"
                                 v-model="newFilesName.program" @change="handleProgramChange">
                                 <option value="" disabled selected v-if="programs.length == 0">Cargando programas...
                                 </option>
@@ -334,7 +334,7 @@ onMounted(() => {
 
                         <div class="input-box">
                             <label for="cycles-options">Escoge el ciclo: </label>
-                            <select id="cycles-options" autocomplete="off" class="input" type="text"
+                            <select id="cycles-options" autocomplete="off" class="input"
                                 v-model="newFilesName.cycle" @change="handleCycleChange"
                                 v-if="cycles[0] != 'No hay ciclos' && newFilesName.program != ''">
                                 <option value="" disabled selected v-if="cycles.length == 0">Cargando ciclos...</option>
@@ -343,11 +343,11 @@ onMounted(() => {
                                     {{ cycle }}
                                 </option>
                             </select>
-                            <select id="cycles-options" autocomplete="off" class="input" type="text"
+                            <select id="cycles-options" autocomplete="off" class="input" 
                                 v-model="newFilesName.cycle" disabled v-else-if="newFilesName.program == ''">
                                 <option value="" disabled selected>Selecciona un programa</option>
                             </select>
-                            <select id="cycles-options" autocomplete="off" class="input" type="text"
+                            <select id="cycles-options" autocomplete="off" class="input"
                                 v-model="newFilesName.cycle" disabled v-else>
                                 <option value="" disabled selected>No hay ciclos</option>
                             </select>
@@ -355,7 +355,7 @@ onMounted(() => {
 
                         <div class="input-box">
                             <label for="weeks-options">Escoge la semana: </label>
-                            <select id="weeks-options" autocomplete="off" class="input" type="text"
+                            <select id="weeks-options" autocomplete="off" class="input" 
                                 v-model="newFilesName.week" @change="makeNewName"
                                 v-if="weeks[0] != 'No hay semanas' && cycles[0] != 'No hay ciclos' && newFilesName.cycle != ''">
                                 <option value="" disabled selected v-if="weeks.length == 0">Cargando semanas...</option>
@@ -364,11 +364,11 @@ onMounted(() => {
                                     {{ week }}
                                 </option>
                             </select>
-                            <select id="weeks-options" autocomplete="off" class="input" type="text"
+                            <select id="weeks-options" autocomplete="off" class="input"
                                 v-model="newFilesName.week" disabled v-else-if="newFilesName.cycle == ''">
                                 <option value="" disabled selected>Selecciona un ciclo</option>
                             </select>
-                            <select id="weeks-options" autocomplete="off" class="input" type="text"
+                            <select id="weeks-options" autocomplete="off" class="input"
                                 v-model="newFilesName.week" disabled v-else>
                                 <option value="" disabled selected>No hay semanas</option>
                             </select>
@@ -376,7 +376,7 @@ onMounted(() => {
 
                         <div class="input-box">
                             <label for="groups-options">Escoge el grupo: </label>
-                            <select id="groups-options" autocomplete="off" class="input" type="text"
+                            <select id="groups-options" autocomplete="off" class="input"
                                 v-model="newFilesName.group" @change="makeNewName"
                                 v-if="groups[0] != 'No hay grupos' && cycles[0] != 'No hay ciclos' && newFilesName.cycle != ''">
                                 <option value="" disabled selected v-if="groups.length == 0">Cargando grupos...</option>
@@ -385,11 +385,11 @@ onMounted(() => {
                                     {{ group }}
                                 </option>
                             </select>
-                            <select id="groups-options" autocomplete="off" class="input" type="text"
-                                v-model="newFilesName.group" disabled v-else-if="newFilesName.week == ''">
+                            <select id="groups-options" autocomplete="off" class="input"
+                                v-model="newFilesName.group" disabled v-else-if="newFilesName.cycle == ''">
                                 <option value="" disabled selected>Selecciona un ciclo</option>
                             </select>
-                            <select id="groups-options" autocomplete="off" class="input" type="text"
+                            <select id="groups-options" autocomplete="off" class="input"
                                 v-model="newFilesName.group" disabled v-else>
                                 <option value="" disabled selected>No hay grupos</option>
                             </select>
@@ -600,7 +600,15 @@ footer {
     text-align: center;
     font-size: 0.8rem;
     color: #666;
+    padding: 1rem;;
+    width: 100%;
+    position: relative;
+    /* Default positioning */
+    bottom: 0;
+    /* Ensures footer is at the bottom */
+    flex-shrink: 0;
 }
+
 
 .not-loaded {
     display: flex;

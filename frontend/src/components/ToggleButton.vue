@@ -37,6 +37,7 @@ const emit = defineEmits(['toggle']);
   cursor: pointer;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: background-color 0.3s;
+  z-index: 1000;
 
   &:hover {
     background-color: #0056b3;
