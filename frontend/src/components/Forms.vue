@@ -11,6 +11,8 @@ import {
     ChangeFileNames
 } from '../../wailsjs/go/main/App';
 
+
+
 const connected = ref(false);
 const contentLoaded = ref(false);
 const programs = ref([]);
@@ -21,6 +23,7 @@ const message = ref("");
 const messageType = ref("");
 const tableVisibility = ref(true);
 const emit = defineEmits(['connected']);
+
 
 localStorage.getItem('connected') ? connected.value = true : connected.value = false;
 localStorage.setItem('connected', connected.value);
@@ -103,7 +106,7 @@ async function connect() {
         return;
     }
     try {
-        
+
         try {
             await ListPrograms();
         } catch (error) {
@@ -292,9 +295,13 @@ onMounted(() => {
 <template>
     <div class="layout-container">
         <aside class="sidebar">
-            <h1>
-                CS50 Name Changer
-            </h1>
+            <aside class="sidebar">
+                <div class="logo">
+                    <img src="./../assets/images/logo.svg" alt="CS50 Name Changer Logo" class="logo-image">
+                    <h1>CS50 Name Changer</h1>
+                </div>
+            </aside>
+
         </aside>
 
         <div v-if="!connected || !contentLoaded" class="not-loaded">
@@ -338,8 +345,8 @@ onMounted(() => {
 
                         <div class="input-box">
                             <label for="cycles-options">Escoge el ciclo: </label>
-                            <select id="cycles-options" autocomplete="off" class="input"
-                                v-model="newFilesName.cycle" @change="handleCycleChange"
+                            <select id="cycles-options" autocomplete="off" class="input" v-model="newFilesName.cycle"
+                                @change="handleCycleChange"
                                 v-if="cycles[0] != 'No hay ciclos' && newFilesName.program != ''">
                                 <option value="" disabled selected v-if="cycles.length == 0">Cargando ciclos...</option>
                                 <option value="" disabled selected v-else>Selecciona un ciclo</option>
@@ -347,20 +354,20 @@ onMounted(() => {
                                     {{ cycle }}
                                 </option>
                             </select>
-                            <select id="cycles-options" autocomplete="off" class="input" 
-                                v-model="newFilesName.cycle" disabled v-else-if="newFilesName.program == ''">
+                            <select id="cycles-options" autocomplete="off" class="input" v-model="newFilesName.cycle"
+                                disabled v-else-if="newFilesName.program == ''">
                                 <option value="" disabled selected>Selecciona un programa</option>
                             </select>
-                            <select id="cycles-options" autocomplete="off" class="input"
-                                v-model="newFilesName.cycle" disabled v-else>
+                            <select id="cycles-options" autocomplete="off" class="input" v-model="newFilesName.cycle"
+                                disabled v-else>
                                 <option value="" disabled selected>No hay ciclos</option>
                             </select>
                         </div>
 
                         <div class="input-box">
                             <label for="weeks-options">Escoge la semana: </label>
-                            <select id="weeks-options" autocomplete="off" class="input" 
-                                v-model="newFilesName.week" @change="makeNewName"
+                            <select id="weeks-options" autocomplete="off" class="input" v-model="newFilesName.week"
+                                @change="makeNewName"
                                 v-if="weeks[0] != 'No hay semanas' && cycles[0] != 'No hay ciclos' && newFilesName.cycle != ''">
                                 <option value="" disabled selected v-if="weeks.length == 0">Cargando semanas...</option>
                                 <option value="" disabled selected v-else>Selecciona una semana</option>
@@ -368,20 +375,20 @@ onMounted(() => {
                                     {{ week }}
                                 </option>
                             </select>
-                            <select id="weeks-options" autocomplete="off" class="input"
-                                v-model="newFilesName.week" disabled v-else-if="newFilesName.cycle == ''">
+                            <select id="weeks-options" autocomplete="off" class="input" v-model="newFilesName.week"
+                                disabled v-else-if="newFilesName.cycle == ''">
                                 <option value="" disabled selected>Selecciona un ciclo</option>
                             </select>
-                            <select id="weeks-options" autocomplete="off" class="input"
-                                v-model="newFilesName.week" disabled v-else>
+                            <select id="weeks-options" autocomplete="off" class="input" v-model="newFilesName.week"
+                                disabled v-else>
                                 <option value="" disabled selected>No hay semanas</option>
                             </select>
                         </div>
 
                         <div class="input-box">
                             <label for="groups-options">Escoge el grupo: </label>
-                            <select id="groups-options" autocomplete="off" class="input"
-                                v-model="newFilesName.group" @change="makeNewName"
+                            <select id="groups-options" autocomplete="off" class="input" v-model="newFilesName.group"
+                                @change="makeNewName"
                                 v-if="groups[0] != 'No hay grupos' && cycles[0] != 'No hay ciclos' && newFilesName.cycle != ''">
                                 <option value="" disabled selected v-if="groups.length == 0">Cargando grupos...</option>
                                 <option value="" disabled selected v-else>Selecciona un grupo</option>
@@ -389,12 +396,12 @@ onMounted(() => {
                                     {{ group }}
                                 </option>
                             </select>
-                            <select id="groups-options" autocomplete="off" class="input"
-                                v-model="newFilesName.group" disabled v-else-if="newFilesName.cycle == ''">
+                            <select id="groups-options" autocomplete="off" class="input" v-model="newFilesName.group"
+                                disabled v-else-if="newFilesName.cycle == ''">
                                 <option value="" disabled selected>Selecciona un ciclo</option>
                             </select>
-                            <select id="groups-options" autocomplete="off" class="input"
-                                v-model="newFilesName.group" disabled v-else>
+                            <select id="groups-options" autocomplete="off" class="input" v-model="newFilesName.group"
+                                disabled v-else>
                                 <option value="" disabled selected>No hay grupos</option>
                             </select>
                         </div>
@@ -472,13 +479,85 @@ onMounted(() => {
 
 .sidebar {
     width: 200px;
-    height: 100vh;
-    background-color: #333;
-    padding-top: 20px;
-    color: white;
-    text-align: center;
-    overflow-y: auto;
+    background-color: #282c34;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+
 }
+
+.logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding:  1rem;
+    height: 100vh;
+}
+
+.logo-image {
+    width: 70%;
+    max-width: 150px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+}
+
+.logo-image:hover {
+    animation: rotation 2s ease-out;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(150deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+.logo h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.sidebar-nav {
+    width: 100%;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-nav ul li {
+    margin: 1rem 0;
+}
+
+.sidebar-nav ul li a {
+    text-decoration: none;
+    font-size: 1rem;
+    color: #ddd;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    display: block;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar-nav ul li a:hover {
+    background-color: #61dafb;
+    color: #282c34;
+}
+
 
 .forms-container {
     display: flex;
@@ -604,7 +683,8 @@ footer {
     text-align: center;
     font-size: 0.8rem;
     color: #666;
-    padding: 1rem;;
+    padding: 1rem;
+    ;
     width: 100%;
     position: relative;
     /* Default positioning */
@@ -702,19 +782,6 @@ footer {
     justify-content: flex-start;
     gap: 1rem;
     height: 100vh;
-}
-
-.sidebar {
-    width: 200px;
-    /* Fixed width to keep the sidebar size consistent */
-    height: 100vh;
-    background-color: #333;
-    padding-top: 20px;
-    color: white;
-    text-align: center;
-    overflow-y: auto;
-    flex-shrink: 0;
-    /* Prevent shrinking of the sidebar */
 }
 
 
@@ -829,5 +896,19 @@ footer {
         }
     }
 
+}
+
+@media (min-width: 990px) {
+
+    .sidebar {
+        width: 280px;
+        h1 {
+            font-size: 2rem;
+        }
+    }
+
+    .main-container {
+        width: calc(100% - 200px);
+    }
 }
 </style>

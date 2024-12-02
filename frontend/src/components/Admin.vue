@@ -42,13 +42,13 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .admin-header {
-    background-color: #333;
+    background-color: #282c34;;
     color: #fff;
     padding: 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
     .navbar {
         display: flex;
         align-items: center;

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1080 1080">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #94f4ff;
+        opacity: .63;
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4, .cls-5, .cls-6 {
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        fill: #ffcc2a;
+      }
+
+      .cls-3 {
+        fill: none;
+      }
+
+      .cls-7 {
+        clip-path: url(#clippath-1);
+      }
+
+      .cls-4 {
+        fill: #150b00;
+      }
+
+      .cls-8 {
+        clip-path: url(#clippath);
+      }
+
+      .cls-5 {
+        fill: #ff853f;
+      }
+
+      .cls-6 {
+        fill: #fff;
+      }
+    </style>
+    <clipPath id="clippath">
+      <polygon class="cls-3" points="221.06 250.1 221.06 250.1 367.14 250.1 367.14 423.7 221.06 423.7 221.06 250.1"/>
+    </clipPath>
+    <clipPath id="clippath-1">
+      <polygon class="cls-3" points="847.72 250.1 847.72 250.1 701.64 250.1 701.64 423.7 847.72 423.7 847.72 250.1"/>
+    </clipPath>
+  </defs>
+  <rect class="cls-2" x="0" y="0" width="1080" height="1080" rx="262" ry="262"/>
+  <path class="cls-5" d="M743.33,503.97c-199.1-295.46-381.18-81.35-434.85-4.37-69.69-8.04-228.04-7.13-199.96,173.68,0,0-15.69,243.93,431.48,216.72,447.17,27.21,431.48-216.72,431.48-216.72,33.4-215.11-197.04-175.6-228.16-169.32Z"/>
+  <circle class="cls-4" cx="534.39" cy="679.02" r="217.03"/>
+  <circle class="cls-1" cx="534.39" cy="679.02" r="167.8"/>
+  <g>
+    <g id="_Mirror_Repeat_" data-name="&amp;lt;Mirror Repeat&amp;gt;">
+      <g class="cls-8">
+        <ellipse class="cls-4" cx="294.1" cy="336.9" rx="73.04" ry="86.8"/>
+      </g>
+    </g>
+    <g id="_Mirror_Repeat_-2" data-name="&amp;lt;Mirror Repeat&amp;gt;">
+      <g class="cls-7">
+        <path class="cls-4" d="M701.64,336.9c0,47.94,32.7,86.8,73.04,86.8,40.34,0,73.04-38.86,73.04-86.8,0-47.94-32.7-86.8-73.04-86.8-40.34,0-73.04,38.86-73.04,86.8Z"/>
+      </g>
+    </g>
+  </g>
+  <ellipse class="cls-6" cx="105.35" cy="540" rx="88.36" ry="62.48"/>
+  <ellipse class="cls-6" cx="973.31" cy="546.08" rx="88.36" ry="62.48"/>
+</svg>

@@ -1,4 +1,3 @@
-<!-- Sidebar.vue -->
 <script setup>
 import { toRefs, defineProps } from 'vue';
 
@@ -12,14 +11,10 @@ const props = defineProps({
     <div class="sidebar">
         <nav>
             <ul>
-                <li :class="{ active: displayView.programs }" 
-                    @click="() => updateView('programs')">Programas</li>
-                <li :class="{ active: displayView.cycles }" 
-                    @click="() => updateView('cycles')">Ciclos</li>
-                <li :class="{ active: displayView.weeks }" 
-                    @click="() => updateView('weeks')">Semanas</li>
-                <li :class="{ active: displayView.groups }" 
-                    @click="() => updateView('groups')">Grupos</li>
+                <li :class="{ active: displayView.programs }" @click="() => updateView('programs')">Programas</li>
+                <li :class="{ active: displayView.cycles }" @click="() => updateView('cycles')">Ciclos</li>
+                <li :class="{ active: displayView.weeks }" @click="() => updateView('weeks')">Semanas</li>
+                <li :class="{ active: displayView.groups }" @click="() => updateView('groups')">Grupos</li>
             </ul>
         </nav>
     </div>
@@ -29,14 +24,14 @@ const props = defineProps({
 .sidebar {
     width: 200px;
     height: 100vh;
-    background-color: #333;
+    background-color: #282c34;
     padding-top: 20px;
-
     nav {
         ul {
             list-style: none;
             padding: 0;
             margin: 0;
+
 
             li {
                 padding: 15px;
