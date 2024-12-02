@@ -78,7 +78,9 @@ function showMessage(type, msg) {
 .tables {
     width: 100%;
     padding: 20px;
-    /* Add padding to the content area */
     background-color: #f8f9fa;
+
+    box-shadow: inset 2px 0 10px rgba(0, 0, 0, 0.52)
 }
+
 </style>

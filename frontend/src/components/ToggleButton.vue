@@ -24,8 +24,8 @@ const emit = defineEmits(['toggle']);
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background-color: #007bff;
   color: #fff;
@@ -42,5 +42,6 @@ const emit = defineEmits(['toggle']);
   &:hover {
     background-color: #0056b3;
   }
+  
 }
 </style>
