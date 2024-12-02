@@ -29,6 +29,10 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	err := a.CreateDB()
+	if err != nil {
+		log.Println(err)
+	}
 }
 func (a *App) shutdown(ctx context.Context) {
 	// Wait for any running operations to complete or handle the context's cancellation
@@ -75,14 +79,158 @@ func (a *App) CloseDB() error {
 }
 
 func (a *App) CreateDB() error {
+	if _, err := os.Stat("cs50x.db"); err == nil {
+		return nil
+	}
 	db, err := a.ConnectDB()
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	if err := a.migrateDB(db); err != nil {
+		log.Println(err)
+		return err
+	}
+	return a.populateDB()
+}
+
+func (a *App) migrateDB(db *gorm.DB) error {
+	return db.AutoMigrate(
+		&models.Program{}, &models.Cycle{}, &models.Week{}, &models.Group{},
+		&models.ProgramsResponse{}, &models.CyclesResponse{}, &models.WeeksResponse{},
+		&models.GroupsResponse{},
+	)
+}
+
+func (a *App) populateDB() error {
+	return a.executeInTransaction(func(tx *gorm.DB) error {
+		programs := []string{"CS50", "Web50"}
+		for _, program := range programs {
+			if err := a.createProgramWithCyclesAndGroups(tx, program); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+func (a *App) createProgramWithCyclesAndGroups(tx *gorm.DB, program string) error {
+	programDB, err := a.getOrCreateProgram(tx, program)
 	if err != nil {
 		return err
 	}
-	db.AutoMigrate(
-		&models.Program{}, &models.Cycle{}, &models.Week{}, &models.Group{},
-		&models.ProgramsResponse{}, &models.CyclesResponse{}, &models.WeeksResponse{},
-		&models.GroupsResponse{})
+	if err := a.createProgramResponse(tx, programDB); err != nil {
+		return err
+	}
+
+	cycles := []string{"Y25C1", "Y25C2"}
+	for _, cycleName := range cycles {
+		cycleDB, err := a.getOrCreateCycle(tx, cycleName, programDB)
+		if err != nil {
+			return err
+		}
+		if err := a.createCycleResponse(tx, cycleDB, programDB.Name); err != nil {
+			return err
+		}
+
+		if err := a.createWeeks(tx, cycleDB); err != nil {
+			return err
+		}
+		if err := a.createGroups(tx, program, cycleDB); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (a *App) getOrCreateProgram(tx *gorm.DB, name string) (*models.Program, error) {
+	var program models.Program
+	err := tx.Where("UPPER(name) = ?", strings.ToUpper(name)).First(&program).Error
+	if err == nil {
+		return &program, nil
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	program = models.Program{Name: name}
+	if err := tx.Create(&program).Error; err != nil {
+		return nil, err
+	}
+	return &program, nil
+}
+
+func (a *App) createProgramResponse(tx *gorm.DB, program *models.Program) error {
+	return tx.Create(&models.ProgramsResponse{
+		ID:   program.ID,
+		Name: program.Name,
+	}).Error
+}
+
+func (a *App) getOrCreateCycle(tx *gorm.DB, name string, program *models.Program) (*models.Cycle, error) {
+	var cycle models.Cycle
+	err := tx.Where("UPPER(name) = ? AND program_id = ?", strings.ToUpper(name), program.ID).First(&cycle).Error
+	if err == nil {
+		return &cycle, nil
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	cycle = models.Cycle{Name: name, ProgramID: program.ID}
+	if err := tx.Create(&cycle).Error; err != nil {
+		return nil, err
+	}
+	return &cycle, nil
+}
+
+func (a *App) createCycleResponse(tx *gorm.DB, cycle *models.Cycle, programName string) error {
+	return tx.Create(&models.CyclesResponse{
+		ID:          cycle.ID,
+		Name:        cycle.Name,
+		ProgramID:   cycle.ProgramID,
+		ProgramName: programName,
+	}).Error
+}
+
+func (a *App) createWeeks(tx *gorm.DB, cycle *models.Cycle) error {
+	for i := 1; i <= 20; i++ {
+		weekName := fmt.Sprintf("S%02d", i)
+		week := models.Week{Name: weekName, CycleID: cycle.ID}
+		if err := tx.Create(&week).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&models.WeeksResponse{
+			ID:        week.ID,
+			Name:      week.Name,
+			CycleID:   week.CycleID,
+			CycleName: cycle.Name,
+		}).Error; err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (a *App) createGroups(tx *gorm.DB, program string, cycle *models.Cycle) error {
+	var groups []string
+	if program == "CS50" {
+		groups = []string{"A", "B", "C", "D", "E", "F"}
+	} else {
+		groups = []string{"A", "B", "C"}
+	}
+	for _, group := range groups {
+		groupDB := models.Group{Name: group, CycleID: cycle.ID}
+		if err := tx.Create(&groupDB).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&models.GroupsResponse{
+			ID:        groupDB.ID,
+			Name:      groupDB.Name,
+			CycleID:   groupDB.CycleID,
+			CycleName: cycle.Name,
+		}).Error; err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -120,13 +268,15 @@ func (a *App) ListCycles(program string) []string {
 	return cycleNames
 }
 
-func (a *App) ListWeeks(cycle string) []string {
+func (a *App) ListWeeks(cycle string, program string) []string {
 	db, err := a.ConnectDB()
 	if err != nil {
 		return nil
 	}
+	var programDB models.Program
+	db.First(&programDB, "name = ?", program)
 	var weeks []models.WeeksResponse
-	db.Joins("Cycle").Find(&weeks, "cycle.name = ?", cycle)
+	db.Joins("Cycle").Find(&weeks, "cycle.name = ? AND cycle.program_id = ?", cycle, programDB.ID)
 	var weekNames []string
 	for _, week := range weeks {
 		weekNames = append(weekNames, week.Name)
@@ -137,13 +287,15 @@ func (a *App) ListWeeks(cycle string) []string {
 	return weekNames
 }
 
-func (a *App) ListGroups(cycle string) []string {
+func (a *App) ListGroups(cycle string, program string) []string {
 	db, err := a.ConnectDB()
 	if err != nil {
 		return nil
 	}
+	var programDB models.Program
+	db.First(&programDB, "name = ?", program)
 	var groups []models.GroupsResponse
-	db.Joins("Cycle").Find(&groups, "cycle.name = ?", cycle)
+	db.Joins("Cycle").Find(&groups, "cycle.name = ? AND cycle.program_id = ?", cycle, programDB.ID)
 	var groupNames []string
 	for _, group := range groups {
 		groupNames = append(groupNames, group.Name)
@@ -593,4 +745,118 @@ func (a *App) WatchGroups() []models.GroupsResponse {
 		})
 	}
 	return groupsResponse
+}
+
+func (a *App) EditProgram(id int, nuevo_nombre string) error {
+	db, err := a.ConnectDB()
+	if err != nil {
+		return err
+	}
+	var existingProgram models.Program
+	if err = db.First(&existingProgram, "name = ?", nuevo_nombre).Error; err == nil {
+		return fmt.Errorf("el programa %s ya existe", nuevo_nombre)
+	}
+
+	var program models.Program
+	err = db.First(&program, "id = ?", id).Error
+	if err != nil {
+		return err
+	}
+
+	if program.Name == nuevo_nombre {
+		return nil
+	}
+	program.Name = nuevo_nombre
+	err = db.Save(&program).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *App) EditCycle(id int, nuevo_nombre string) error {
+	db, err := a.ConnectDB()
+	if err != nil {
+		return err
+	}
+
+	var cycle models.Cycle
+	err = db.First(&cycle, "id = ?", id).Error
+	if err != nil {
+		return err
+	}
+
+	if cycle.Name == nuevo_nombre {
+		return nil
+	}
+
+	var existingCycle models.Cycle
+	if err = db.First(&existingCycle, "name = ? AND program_id = ?", nuevo_nombre, cycle.ProgramID).Error; err == nil {
+		return fmt.Errorf("el ciclo %s ya existe", nuevo_nombre)
+	}
+
+	cycle.Name = nuevo_nombre
+	err = db.Save(&cycle).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *App) EditWeek(id int, nuevo_nombre string) error {
+	db, err := a.ConnectDB()
+	if err != nil {
+		return err
+	}
+
+	var week models.Week
+	err = db.First(&week, "id = ?", id).Error
+	if err != nil {
+		return err
+	}
+
+	if week.Name == nuevo_nombre {
+		return nil
+	}
+
+	var existingWeek models.Week
+	if err = db.First(&existingWeek, "name = ? AND cycle_id = ?", nuevo_nombre, week.CycleID).Error; err == nil {
+		return fmt.Errorf("la semana %s ya existe", nuevo_nombre)
+	}
+
+	week.Name = nuevo_nombre
+	err = db.Save(&week).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *App) EditGroup(id int, nuevo_nombre string) error {
+	db, err := a.ConnectDB()
+	if err != nil {
+		return err
+	}
+
+	var group models.Group
+	err = db.First(&group, "id = ?", id).Error
+	if err != nil {
+		return err
+	}
+
+	if group.Name == nuevo_nombre {
+		return nil
+	}
+
+	var existingGroup models.Group
+	if err = db.First(&existingGroup, "name = ? AND cycle_id = ?", nuevo_nombre, group.CycleID).Error; err == nil {
+		return fmt.Errorf("el grupo %s ya existe", nuevo_nombre)
+	}
+
+	group.Name = nuevo_nombre
+	err = db.Save(&group).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

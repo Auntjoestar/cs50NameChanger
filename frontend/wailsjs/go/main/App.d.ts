@@ -27,13 +27,21 @@ export function DeleteProgram(arg1:number):Promise<void>;
 
 export function DeleteWeek(arg1:number):Promise<void>;
 
+export function EditCycle(arg1:number,arg2:string):Promise<void>;
+
+export function EditGroup(arg1:number,arg2:string):Promise<void>;
+
+export function EditProgram(arg1:number,arg2:string):Promise<void>;
+
+export function EditWeek(arg1:number,arg2:string):Promise<void>;
+
 export function ListCycles(arg1:string):Promise<Array<string>>;
 
-export function ListGroups(arg1:string):Promise<Array<string>>;
+export function ListGroups(arg1:string,arg2:string):Promise<Array<string>>;
 
 export function ListPrograms():Promise<Array<string>>;
 
-export function ListWeeks(arg1:string):Promise<Array<string>>;
+export function ListWeeks(arg1:string,arg2:string):Promise<Array<string>>;
 
 export function MakeNewName(arg1:string,arg2:string,arg3:string,arg4:string):Promise<string>;
 

@@ -1,12 +1,15 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { WatchGroups, DeleteGroup } from '../../wailsjs/go/main/App';
+import { ref, onMounted, defineEmits } from 'vue';
+import { WatchGroups, DeleteGroup, EditGroup } from '../../wailsjs/go/main/App';
 import ConfirmDialog from './ConfirmDialog.vue';
 
 const groups = ref([]);
 const showConfirmDialog = ref(false);
 const selectedGroupId = ref(null);
-const isLoading = ref(true); // Loading state
+const isLoading = ref(true);
+const editIndex = ref(null);
+const editedName = ref("");
+const emits = defineEmits(['group-edited', 'error']);
 
 async function watchGroups() {
     try {
@@ -41,7 +44,38 @@ function cancelDeleteGroup() {
     selectedGroupId.value = null;
 }
 
-// Fetch groups when the component is mounted
+function startEdit(index, name) {
+    editIndex.value = index;
+    editedName.value = name;
+}
+
+function cancelEdit() {
+    editIndex.value = null;
+    editedName.value = '';
+}
+
+function saveEdit(id) {
+    if (editedName.value.trim()) {
+        EditGroup(id, editedName.value.trim()).then(() => {
+            const group = groups.value.find(group => group.id === id);
+            group.name = editedName.value.trim();
+            editIndex.value = null;
+            editedName.value = '';
+            emits('group-edited');
+        }).catch(error => {
+            error = error.charAt(0).toUpperCase() + error.slice(1);
+            console.error("Error editing group:", error);
+            emits('error', error);
+        });
+        return;
+    }
+    emits('error', 'El nombre del grupo no puede estar vacío');
+}
+
+function isSavingDisabled(group) {
+    return !editedName.value.trim() || editedName.value.trim() === group;
+}
+
 onMounted(() => {
     watchGroups();
 });
@@ -66,11 +100,30 @@ onMounted(() => {
                     <tr v-for="(group, index) in groups" :key="index">
                         <td hidden>{{ group.id }}</td>
                         <td>{{ index + 1 }}</td>
-                        <td>{{ group.name }}</td>
+                        <td>
+                            <div v-if="editIndex === index">
+                                <input type="text" v-model="editedName" class="form-control" />
+                                <button class="btn btn-success" @click="saveEdit(group.id)"
+                                    :disabled="isSavingDisabled(group.name)">
+                                    <i class="fas fa-save"></i>
+                                </button>
+                            </div>
+                            <div v-else>
+                                {{ group.name }}
+                            </div>
+                        </td>
                         <td>{{ group.cycle_name }}</td>
                         <td>
-                            <button class="btn-delete" @click="promptDeleteGroup(group.id)"
-                                aria-label="Eliminar grupo">Eliminar</button>
+                            <button class="btn btn-primary" @click="startEdit(index, group.name)"
+                                v-if="editIndex !== index">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-primary " @click="cancelEdit()" v-else>
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <button class="btn btn-danger" @click="promptDeleteGroup(group.id)">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </td>
                     </tr>
                 </tbody>

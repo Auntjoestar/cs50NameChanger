@@ -36,10 +36,13 @@ listPrograms();
     <form @submit.prevent="createCycle" @keydown.enter="createCycle">
         <h2 class="form-title">Crear Ciclo</h2>
         <input type="text" v-model="cycle.name" placeholder="Ciclo" class="form-control" />
-        <select v-model="cycle.program" placeholder="Programa" class="form-control form-select">
+        <select v-model="cycle.program" placeholder="Programa" class="form-control form-select" v-if="programs[0] !== 'No hay programas'">
             <option value="" disabled>Selecciona un programa</option>
             <option v-if="programs[0] === 'No hay programas'" :value="programs[0]" disabled>{{ programs[0] }}</option>
             <option v-else v-for="(program, index) in programs" :key="index">{{ program }}</option>
+        </select>
+        <select disabled class="form-control form-select" v-else>
+            <option value="" disabled selected>No hay programas</option>
         </select>
         <button type="button" @click="createCycle" class="btn btn-dark"
             :disabled="cycle.name === '' || cycle.program === ''">Crear</button>

@@ -1,12 +1,15 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { WatchPrograms, DeleteProgram } from '../../wailsjs/go/main/App'; // Assuming these are your actual imports
+import { ref, onMounted, defineEmits } from 'vue';
+import { WatchPrograms, DeleteProgram, EditProgram } from '../../wailsjs/go/main/App';
 import ConfirmDialog from './ConfirmDialog.vue';
 
 const programs = ref([]);
+const isLoading = ref(true);
 const showConfirmDialog = ref(false);
 const selectedProgramId = ref(null);
-const isLoading = ref(true); // Loading state
+const editIndex = ref(null); // Track currently edited index
+const editedName = ref(""); // Store the value of the edited name
+const emits = defineEmits(['program-edited', 'error']);
 
 async function watchPrograms() {
     try {
@@ -17,7 +20,7 @@ async function watchPrograms() {
     } catch (error) {
         console.error("Error fetching programs:", error);
     } finally {
-        isLoading.value = false; // Set loading to false once the fetching is done
+        isLoading.value = false;
     }
 }
 
@@ -40,13 +43,49 @@ function cancelDeleteProgram() {
     selectedProgramId.value = null;
 }
 
-watchPrograms();
+function startEdit(index, name) {
+    editIndex.value = index;
+    editedName.value = name;
+}
+
+function cancelEdit() {
+    editIndex.value = null;
+    editedName.value = '';
+}
+
+function saveEdit(id) {
+    if (editedName.value.trim()) {
+        EditProgram(id, editedName.value.trim()).then(() => {
+            const program = programs.value.find(program => program.id === id);
+            if (program) {
+                program.name = editedName.value.trim();
+            }
+            cancelEdit();
+            emits('program-edited');
+        }).catch(error => {
+            error = error.charAt(0).toUpperCase() + error.slice(1);
+            console.error("Error actualizando el programa:", error);
+            emits('error', error);
+        });
+        return;
+    }
+    emits('error', 'El nombre del programa no puede estar vacío');
+}
+
+function isSavingDisabled(program) {
+    return !editedName.value.trim() || editedName.value.trim() === program;
+}
+
+onMounted(() => {
+    watchPrograms();
+});
 </script>
 
+
 <template>
-    <h2>Programas (Total: {{ programs.length }})</h2> 
+    <h2>Programas (Total: {{ programs.length }})</h2>
     <div class="table-container" v-if="programs.length > 0 || isLoading">
-        <div v-if="isLoading" class="loading-indicator">Cargando...</div> 
+        <div v-if="isLoading" class="loading-indicator">Cargando...</div>
         <div class="table-wrapper">
             <table v-if="!isLoading && programs.length > 0" class="custom-table">
                 <thead>
@@ -61,15 +100,35 @@ watchPrograms();
                     <tr v-for="(program, index) in programs" :key="program.id">
                         <td hidden>{{ program.id }}</td>
                         <td>{{ index + 1 }}</td>
-                        <td>{{ program.name }}</td>
                         <td>
-                            <button class="btn-delete" @click="promptDeleteProgram(program.id)"
-                                aria-label="Eliminar programa">Eliminar</button>
+                            <div v-if="editIndex === index">
+                                <input type="text" v-model="editedName" class="form-control" />
+                                <button @click="saveEdit(program.id)" class="btn btn-success"
+                                    :disabled="isSavingDisabled(program.name)">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </div>
+                            <div v-else>
+                                {{ program.name }}
+                            </div>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary" @click="startEdit(index, program.name)"
+                                v-if="editIndex !== index">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-primary " @cick="cancelEdit()" v-else>
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <button class="btn btn-danger" @click="promptDeleteProgram(program.id)">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
+
     </div>
     <div class="no-programs" v-else>
         <p>No hay programas disponibles.</p>

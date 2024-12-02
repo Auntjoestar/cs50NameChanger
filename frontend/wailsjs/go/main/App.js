@@ -50,20 +50,36 @@ export function DeleteWeek(arg1) {
   return window['go']['main']['App']['DeleteWeek'](arg1);
 }
 
+export function EditCycle(arg1, arg2) {
+  return window['go']['main']['App']['EditCycle'](arg1, arg2);
+}
+
+export function EditGroup(arg1, arg2) {
+  return window['go']['main']['App']['EditGroup'](arg1, arg2);
+}
+
+export function EditProgram(arg1, arg2) {
+  return window['go']['main']['App']['EditProgram'](arg1, arg2);
+}
+
+export function EditWeek(arg1, arg2) {
+  return window['go']['main']['App']['EditWeek'](arg1, arg2);
+}
+
 export function ListCycles(arg1) {
   return window['go']['main']['App']['ListCycles'](arg1);
 }
 
-export function ListGroups(arg1) {
-  return window['go']['main']['App']['ListGroups'](arg1);
+export function ListGroups(arg1, arg2) {
+  return window['go']['main']['App']['ListGroups'](arg1, arg2);
 }
 
 export function ListPrograms() {
   return window['go']['main']['App']['ListPrograms']();
 }
 
-export function ListWeeks(arg1) {
-  return window['go']['main']['App']['ListWeeks'](arg1);
+export function ListWeeks(arg1, arg2) {
+  return window['go']['main']['App']['ListWeeks'](arg1, arg2);
 }
 
 export function MakeNewName(arg1, arg2, arg3, arg4) {

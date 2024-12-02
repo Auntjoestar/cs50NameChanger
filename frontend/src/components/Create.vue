@@ -7,7 +7,7 @@ import CycleForm from './CreateCycleForm.vue';
 import WeekForm from './CreateWeekForm.vue';
 import GroupForm from './CreateGroupForm.vue';
 
-const message = ref(''); 
+const message = ref('');
 const messageType = ref('alert-success');
 
 const createView = reactive({

@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { WatchCycles, DeleteCycle } from '../../wailsjs/go/main/App';
+import { ref, onMounted, defineEmits } from 'vue';
+import { WatchCycles, DeleteCycle, EditCycle } from '../../wailsjs/go/main/App';
 import ConfirmDialog from './ConfirmDialog.vue';
 
 const cycles = ref([]);
@@ -8,6 +8,10 @@ const showConfirmDialog = ref(false);
 const selectedCycleId = ref(null);
 const isLoading = ref(true); // Loading state
 const errorMessage = ref(null); // Error handling
+const editIndex = ref(null)
+const editedName = ref("")
+const emits = defineEmits(['cycle-edited', 'error']);
+
 
 async function watchCycles() {
     try {
@@ -38,9 +42,10 @@ async function confirmDeleteCycle() {
             cycles.value = cycles.value.filter(cycle => cycle.id !== selectedCycleId.value);
             showConfirmDialog.value = false;
             selectedCycleId.value = null;
+            emits('cycle-edited');
         } catch (error) {
             console.error("Error deleting cycle:", error);
-            errorMessage.value = "Error al eliminar el ciclo. Por favor, inténtelo de nuevo."; // User-friendly error message
+            emits('error', error);
         }
     }
 }
@@ -50,14 +55,49 @@ function cancelDeleteCycle() {
     selectedCycleId.value = null;
 }
 
-watchCycles();
+function startEdit(index, name) {
+    editIndex.value = index;
+    editedName.value = name
+}
+
+function cancelEdit() {
+    editIndex.value = null;
+    editedName.value = '';
+}
+
+async function saveEdit(id) {
+    if (editedName.value.trim()) {
+        try {
+            await EditCycle(id, editedName.value.trim());
+            const cycle = cycles.value.find(cycle => cycle.id === id);
+            if (cycle) {
+                cycle.name = editedName.value.trim();
+            }
+            cancelEdit();
+            emits('cycle-edited');
+        } catch (error) {
+            error = error.charAt(0).toUpperCase() + error.slice(1);
+            console.error("Error updating cycle:", error);
+            emits('error', error);
+        }
+        return;
+    }
+    emits('error', 'El nombre del ciclo no puede estar vacío');
+}
+
+function isSavingDisabled(program) {
+    return !editedName.value.trim() || editedName.value.trim() === program;
+}
+
+onMounted(() => {
+    watchCycles();
+});
 </script>
 
 <template>
-    <h2>Ciclos (Total: {{ cycles.length }})</h2> 
+    <h2>Ciclos (Total: {{ cycles.length }})</h2>
     <div class="table-container" v-if="cycles.length > 0 || isLoading || errorMessage">
-        <div v-if="isLoading" class="loading-indicator">Cargando...</div> 
-        <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div> 
+        <div v-if="isLoading" class="loading-indicator">Cargando...</div>
         <table v-else-if="cycles.length > 0" class="custom-table">
             <thead>
                 <tr>
@@ -72,10 +112,29 @@ watchCycles();
                 <tr v-for="(cycle, index) in cycles" :key="cycle.id">
                     <td hidden>{{ cycle.id }}</td>
                     <td>{{ index + 1 }}</td>
-                    <td>{{ cycle.name }}</td>
+                    <td>
+                        <div v-if="editIndex === index">
+                            <input type="text" v-model="editedName" class="form-control" />
+                            <button class="btn btn-success" @click="saveEdit(cycle.id)"
+                                :disabled="isSavingDisabled(cycle.name)">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
+                        <div v-else>
+                            {{ cycle.name }}
+                        </div>
+                    </td>
                     <td>{{ cycle.program_name }}</td>
                     <td>
-                        <button class="btn-delete" @click="promptDeleteCycle(cycle.id)">Eliminar</button>
+                        <button class="btn btn-primary" @click="startEdit(index, cycle.name)"
+                            v-if="editIndex !== index"><i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-primary" @click="cancelEdit()" v-else>
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <button class="btn btn-danger" @click="promptDeleteCycle(cycle.id)">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </td>
                 </tr>
             </tbody>

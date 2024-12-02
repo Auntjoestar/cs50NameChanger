@@ -1,7 +1,7 @@
 {
   "$schema": "https://wails.io/schemas/config.v2.json",
   "name": "cs50NameChanger",
-  "outputfilename": "cs50NameChanger",
+  "outputfilename": "CS50 Name Changer",
   "frontend:install": "npm install",
   "frontend:build": "npm run build",
   "frontend:dev:watcher": "npm run dev",
@@ -9,5 +9,15 @@
   "author": {
     "name": "auntjoestar",
     "email": "88282065+Auntjoestar@users.noreply.github.com"
-  }
+  },
+  "platforms": [
+    "windows/amd64",
+    "windows/386"
+  ],
+  "windows": {
+    "nsis": {
+      "installerName": "CS50_Name_Changer_Installer"
+    }
+  },
+  "icon": "duckylogo.png"
 }

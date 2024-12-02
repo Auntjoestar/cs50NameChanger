@@ -95,13 +95,15 @@ function connectEventListeners() {
 }
 
 async function connect() {
+    const err = await CreateDB();
+    if (err) {
+        connected.value = false;
+        message.value = `Error al conectar con la base de datos: ${err}`;
+        messageType.value = "alert-danger";
+        return;
+    }
     try {
-        try {
-            await CreateDB();
-        } catch (error) {
-            message.value = `Error al crear la base de datos: ${error}`;
-            messageType.value = "alert-danger";
-        }
+        
         try {
             await ListPrograms();
         } catch (error) {
@@ -115,6 +117,8 @@ async function connect() {
         message.value = `Error al conectar con la base de datos: ${error}`;
         messageType.value = "alert-danger";
     }
+    connected.value = true;
+    localStorage.setItem('connected', connected.value);
 }
 
 async function listCycles() {
@@ -141,7 +145,7 @@ async function listWeeks() {
             weeks.value = ["Selecciona un ciclo"];
             return;
         }
-        const result = await ListWeeks(newFilesName.cycle);
+        const result = await ListWeeks(newFilesName.cycle, newFilesName.program);
         if (result[0] === "No hay semanas") {
             weeks.value = ["No hay semanas"];
             return;
@@ -159,7 +163,7 @@ async function listGroups() {
             groups.value = ["Selecciona un ciclo"];
             return;
         }
-        const result = await ListGroups(newFilesName.cycle);
+        const result = await ListGroups(newFilesName.cycle, newFilesName.program);
         if (result[0] === "No hay grupos") {
             groups.value = ["No hay grupos"];
             return;

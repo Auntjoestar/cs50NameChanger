@@ -80,10 +80,13 @@ listPrograms();
         <h2 class="form-title">Crear Semana</h2>
         <input type="text" v-model="week.name" placeholder="Semana" class="form-control" />
         <select v-model="week.program" @change="handleProgramChange" class="form-control form-select"
-            placeholder="Programa">
+            placeholder="Programa" v-if="programs[0] !== 'No hay programas'">
             <option value="" disabled>Selecciona un programa</option>
             <option v-if="programs[0] === 'No hay programas'" :value="programs[0]" disabled>{{ programs[0] }}</option>
             <option v-else v-for="(program, index) in programs" :key="index">{{ program }}</option>
+        </select>
+        <select class="form-control form-select" v-else disabled>
+            <option value="" disabled selected>No hay programas</option>
         </select>
         <select v-model="week.cycle" placeholder="Ciclo" class="form-control form-select" v-if="week.program && cycles[0] !== 'No hay ciclos'">
             <option value="" disabled>Selecciona un ciclo</option>
@@ -94,7 +97,7 @@ listPrograms();
             class="form-control form-select" disabled>
             <option value="" disabled selected>No hay ciclos</option>
         </select>
-        <select placeholder="Ciclo" class="form-control form-select" v-else>
+        <select placeholder="Ciclo" class="form-control form-select" v-else disabled>
             <option value="" disabled selected>Selecciona un programa primero</option>
         </select>
         <button type="button" class="btn btn-dark" @click="createWeek"

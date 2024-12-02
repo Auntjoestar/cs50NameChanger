@@ -1,12 +1,15 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { WatchWeeks, DeleteWeek } from '../../wailsjs/go/main/App';
+import { ref, onMounted, defineEmits } from 'vue';  
+import { WatchWeeks, DeleteWeek, EditWeek } from '../../wailsjs/go/main/App';
 import ConfirmDialog from './ConfirmDialog.vue';
 
 const weeks = ref([]);
 const showConfirmDialog = ref(false);
 const selectedWeekId = ref(null);
-const isLoading = ref(true); // Add loading state
+const isLoading = ref(true); 
+const editIndex = ref(null);
+const editedName = ref("");
+const emits = defineEmits(['week-edited', 'error']);
 
 async function watchWeeks() {
     try {
@@ -41,7 +44,40 @@ function cancelDeleteWeek() {
     selectedWeekId.value = null;
 }
 
-// Fetch weeks when the component is mounted
+function startEdit(index, name) {
+    editIndex.value = index;
+    editedName.value = name;
+}
+
+function cancelEdit() {
+    editIndex.value = null;
+    editedName.value = '';
+}
+
+function saveEdit(id) {
+    if (editedName.value.trim()) {
+        EditWeek(id, editedName.value.trim()).then(() => {
+            const week = weeks.value.find(week => week.id === id);
+            if (week) {
+                week.name = editedName.value.trim();
+            }
+            editIndex.value = null;
+            editedName.value = '';
+            emits('week-edited');
+        }).catch(error => {
+            error = error.charAt(0).toUpperCase() + error.slice(1);
+            console.error("Error editing week:", error);
+            emits('error', error);
+        });
+        return;
+    }
+    emits('error', 'El nombre de la semana no puede estar vacío.');
+}
+
+function isSavingDisabled(week) {
+    return !editedName.value.trim() || editedName.value.trim() === week;
+}
+
 onMounted(() => {
     watchWeeks();
 });
@@ -66,11 +102,30 @@ onMounted(() => {
                     <tr v-for="(week, index) in weeks" :key="index">
                         <td hidden>{{ week.id }}</td>
                         <td>{{ index + 1 }}</td>
-                        <td>{{ week.name }}</td>
+                        <td>
+                            <div v-if="editIndex === index">
+                                <input type="text" v-model="editedName" class="form-control" />
+                                <button class="btn btn-success" @click="saveEdit(week.id)"
+                                    :disabled="isSavingDisabled(week.name)">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </div>
+                            <div v-else>
+                                {{ week.name }}
+                            </div>
+                        </td>
                         <td>{{ week.cycle_name }}</td>
                         <td>
-                            <button class="btn-delete" @click="promptDeleteWeek(week.id)"
-                                aria-label="Eliminar semana">Eliminar</button>
+                            <button class="btn btn-primary" @click="startEdit(index, week.name)"
+                                v-if="editIndex !== index">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-primary " @click="cancelEdit()" v-else>
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <button class="btn btn-danger" @click="promptDeleteWeek(week.id)">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </td>
                     </tr>
                 </tbody>
