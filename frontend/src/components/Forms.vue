@@ -539,7 +539,7 @@ onMounted(() => {
             align-items: center;
             justify-content: center;
             input {
-                width: 40%;
+                width: 50%;
             }
         }
     }
@@ -768,9 +768,9 @@ footer {
     flex-grow: 1;
     width: 75vw;
     max-height: 90vh;
-    overflow-y: auto;
     padding: 1rem;
     margin: auto;
+    overflow-y: scroll;
 }
 
 #new-name {
@@ -838,6 +838,7 @@ footer {
     justify-content: flex-start;
     gap: 1rem;
     height: 100vh;
+    width: 100%;
 }
 
 
@@ -864,7 +865,7 @@ footer {
     gap: 1rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 666px) {
 
     .layout-container {
         flex-direction: column;
@@ -872,10 +873,23 @@ footer {
     }
 
     .sidebar {
+        flex-direction: row;
         width: 100%;
         /* Full-width for mobile */
         height: auto;
         padding: 10px;
+        padding: 0;
+        .logo {
+            height: 100%;
+            flex-direction: row;
+            align-items: end;
+            gap: 1rem;
+            margin-bottom: 0;
+        }
+        .logo-image {
+            width: 10%;
+            margin-bottom: 0;
+        }
     }
 
     .main-container {
@@ -932,8 +946,6 @@ footer {
             display: block;
             width: 100%;
             overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            /* Smooth scrolling on iOS */
         }
 
         .custom-table th,
@@ -950,6 +962,11 @@ footer {
             font-size: 12px;
             /* Smaller font size for very small screens */
         }
+
+        #index {
+            font-size: 0.8rem;
+            width: 70%;
+        }
     }
 
 }
@@ -964,8 +981,5 @@ footer {
         }
     }
 
-    .main-container {
-        width: calc(100% - 200px);
-    }
 }
 </style>

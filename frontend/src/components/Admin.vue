@@ -12,6 +12,7 @@ const view = reactive({
 
 onMounted(() => {
     document.body.style.overflow = 'hidden'; 
+    window.scrollTo(0, 0);
 });
 
 
