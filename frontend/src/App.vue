@@ -65,7 +65,7 @@ body {
 
 @media (max-width: 768px) {
   body {
-    overflow: auto;
+    overflow-y: hidden;
   }
 }
 

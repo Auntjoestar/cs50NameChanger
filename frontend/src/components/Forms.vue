@@ -770,7 +770,6 @@ footer {
     max-height: 90vh;
     padding: 1rem;
     margin: auto;
-    overflow-y: scroll;
 }
 
 #new-name {
@@ -850,13 +849,13 @@ footer {
     flex-grow: 1;
     width: 100%;
     max-height: 90vh;
-    overflow-y: auto;
     padding: 1rem;
     margin: auto;
 }
 
 .layout-container-2 {
     width: 100%;
+    overflow-y: scroll;
 }
 
 .table-container {
