@@ -3,7 +3,7 @@
 import {gorm} from '../models';
 import {models} from '../models';
 
-export function ChangeFileNames(arg1:Array<string>,arg2:string):Promise<void>;
+export function ChangeFileNames(arg1:Array<string>,arg2:string,arg3:number):Promise<void>;
 
 export function CloseDB():Promise<void>;
 
@@ -52,6 +52,8 @@ export function OpenFolder(arg1:string):Promise<void>;
 export function WatchCycles():Promise<Array<models.CyclesResponse>>;
 
 export function WatchGroups():Promise<Array<models.GroupsResponse>>;
+
+export function WatchLastCreatedIndex(arg1:string):Promise<number>;
 
 export function WatchPrograms():Promise<Array<models.ProgramsResponse>>;
 

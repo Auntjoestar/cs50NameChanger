@@ -8,7 +8,8 @@ import {
     ListGroups,
     MakeNewName,
     OpenFileDialog,
-    ChangeFileNames
+    ChangeFileNames,
+    WatchLastCreatedIndex,
 } from '../../wailsjs/go/main/App';
 
 
@@ -23,6 +24,8 @@ const message = ref("");
 const messageType = ref("");
 const tableVisibility = ref(true);
 const emit = defineEmits(['connected']);
+const lastCreatedIndex = ref(0);
+const index = ref(0);
 
 
 localStorage.getItem('connected') ? connected.value = true : connected.value = false;
@@ -43,7 +46,7 @@ function keydownConnect(e) {
     switch (e.key) {
         case "Enter":
             if (newFilesName.name) {
-                if (newFilesName.files.length > 0) {
+                if (newFilesName.files.length > 0 && index.value >= lastCreatedIndex.value) {
                     changeFileNames();
                     shouldPreventDefault = true;
                 }
@@ -227,6 +230,11 @@ async function addFiles() {
 async function makeNewName() {
     try {
         newFilesName.name = await MakeNewName(newFilesName.program, newFilesName.cycle, newFilesName.week, newFilesName.group);
+        if (newFilesName.name !== "Nombre del archivo") {
+            const result = await WatchLastCreatedIndex(newFilesName.name);
+            lastCreatedIndex.value = parseInt(result) + 1
+            index.value = lastCreatedIndex.value;
+        }
     } catch (error) {
         message.value = error;
         messageType.value = "alert-danger";
@@ -235,10 +243,15 @@ async function makeNewName() {
 
 function changeFileNames() {
     try {
-        ChangeFileNames(newFilesName.files, newFilesName.name);
+        ChangeFileNames(newFilesName.files, newFilesName.name, parseInt(index.value));
         newFilesName.files = [];
         message.value = "Nombres cambiados";
         messageType.value = "alert-success";
+        newFilesName.name = "";
+        newFilesName.program = "";
+        newFilesName.cycle = "";
+        newFilesName.week = "";
+        newFilesName.group = "";
     } catch (error) {
         message.value = error;
         messageType.value = "alert-danger";
@@ -455,9 +468,20 @@ onMounted(() => {
                     </table>
                     <div class="actions">
                         <button class="btn-change" @click="changeFileNames"
-                            :disabled="!newFilesName.name || newFilesName.name == 'Nombre del archivo'">
+                            :disabled="!newFilesName.name || newFilesName.name === 'Nombre del archivo' || index < lastCreatedIndex">
                             Cambiar nombres
                         </button>
+                        <div class="select-index">
+                            <label for="index">Índice de inicio:</label>
+                            <div class="index">
+                            <input type="number" v-model="index" :min=lastCreatedIndex
+                                v-if="newFilesName.name && newFilesName.name !== 'Nombre del archivo'"
+                                title="Índice de inicio" id="index" class="input" />
+                            <i class="fas fa-info-circle"
+                                title="Él índice comenzara con respecto al último archivo creado"
+                                data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="hover focus"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </main>
@@ -488,12 +512,45 @@ onMounted(() => {
 
 }
 
+.actions {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    align-items: flex-start;
+
+    button {
+        height: 100%;
+    }
+
+    
+    .btn-change {
+                align-self: flex-end !important;
+            }
+
+    .select-index {
+        width: 20%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        .index {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            input {
+                width: 40%;
+            }
+        }
+    }
+}
+
 .logo {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-bottom: 2rem;
-    padding:  1rem;
+    padding: 1rem;
     height: 100vh;
 }
 
@@ -758,7 +815,6 @@ footer {
         background-color: #f1f1f1;
     }
 
-    margin-bottom: 1rem;
 }
 
 .custom-table.collapsed {
@@ -902,6 +958,7 @@ footer {
 
     .sidebar {
         width: 280px;
+
         h1 {
             font-size: 2rem;
         }

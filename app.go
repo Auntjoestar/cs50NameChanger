@@ -597,14 +597,13 @@ func (a *App) OpenFileDialog() ([]string, error) {
 	return filepath, nil
 }
 
-func (a *App) ChangeFileNames(files []string, newName string) error {
+func (a *App) ChangeFileNames(files []string, newName string, start_index int) error {
 	exePath, err := os.Executable()
 	if err != nil {
 		return err
 	}
 	newPath := filepath.Join(filepath.Dir(exePath), newName)
 
-	// Check if the directory already exists
 	if _, err := os.Stat(newPath); os.IsNotExist(err) {
 		// If it doesn't exist, create it
 		err = os.Mkdir(newPath, 0755)
@@ -613,29 +612,12 @@ func (a *App) ChangeFileNames(files []string, newName string) error {
 		}
 	}
 
-	// Get the current max index of the files already in the directory
-	maxIndex := 0
-	filesInDir, err := os.ReadDir(newPath)
-	if err != nil {
-		return err
-	}
-
-	for _, f := range filesInDir {
-		fileName := f.Name()
-		var index int
-		// Check if the filename matches the pattern "newName_X.ext" and extract the index
-		_, err := fmt.Sscanf(fileName, newName+"%d", &index)
-		if err == nil && index > maxIndex {
-			maxIndex = index
-		}
-	}
-
-	// Start renaming from the next index
-	for i := 0; i < len(files); i++ {
-		file := files[i]
-		newFileName := fmt.Sprintf("%s%d%s", newName, maxIndex+i+1, filepath.Ext(file))
+	for i := start_index; i < len(files)+start_index; i++ {
+		file := files[i-start_index]
+		fileExt := filepath.Ext(file)
+		newFileName := fmt.Sprintf("%s%d%s", newName, i, fileExt)
 		newFilePath := filepath.Join(newPath, newFileName)
-		err = os.Rename(file, newFilePath)
+		err := os.Rename(file, newFilePath)
 		if err != nil {
 			return err
 		}
@@ -649,6 +631,28 @@ func (a *App) ChangeFileNames(files []string, newName string) error {
 func (a *App) OpenFolder(path string) error {
 	runtime.BrowserOpenURL(a.ctx, "file://"+path)
 	return nil
+}
+
+func (a *App) WatchLastCreatedIndex(newName string) int {
+	exePath, err := os.Executable()
+	if err != nil {
+		return 0
+	}
+	newPath := filepath.Join(filepath.Dir(exePath), newName)
+	filesInDir, err := os.ReadDir(newPath)
+	if err != nil {
+		return 0
+	}
+	maxIndex := 0
+	for _, f := range filesInDir {
+		fileName := f.Name()
+		var index int
+		_, err := fmt.Sscanf(fileName, newName+"%d", &index)
+		if err == nil && index > maxIndex {
+			maxIndex = index
+		}
+	}
+	return maxIndex
 }
 
 func (a *App) WatchPrograms() []models.ProgramsResponse {
