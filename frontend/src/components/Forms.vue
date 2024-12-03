@@ -471,11 +471,11 @@ onMounted(() => {
                             :disabled="!newFilesName.name || newFilesName.name === 'Nombre del archivo' || index < lastCreatedIndex">
                             Cambiar nombres
                         </button>
-                        <div class="select-index">
+                        <div class="select-index" v-if="newFilesName.name && newFilesName.name !== 'Nombre del archivo'">
                             <label for="index">Índice de inicio:</label>
                             <div class="index">
                             <input type="number" v-model="index" :min=lastCreatedIndex
-                                v-if="newFilesName.name && newFilesName.name !== 'Nombre del archivo'"
+                                
                                 title="Índice de inicio" id="index" class="input" />
                             <i class="fas fa-info-circle"
                                 title="Él índice comenzara con respecto al último archivo creado"
@@ -520,6 +520,7 @@ onMounted(() => {
 
     button {
         height: 100%;
+        max-height: 40px;
     }
 
     
@@ -629,7 +630,7 @@ onMounted(() => {
     color: white;
     cursor: pointer;
     transition: background-color 0.3s;
-    height: 1%;
+    height: 7%;
 }
 
 .container {
@@ -760,17 +761,7 @@ footer {
     flex-grow: 1;
 }
 
-.main-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    background-color: #f8f9fa;
-    flex-grow: 1;
-    width: 75vw;
-    max-height: 90vh;
-    padding: 1rem;
-    margin: auto;
-}
+
 
 #new-name {
     margin-top: 1rem;
@@ -848,7 +839,6 @@ footer {
     background-color: #f8f9fa;
     flex-grow: 1;
     width: 100%;
-    max-height: 90vh;
     padding: 1rem;
     margin: auto;
 }
@@ -856,6 +846,8 @@ footer {
 .layout-container-2 {
     width: 100%;
     overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
 }
 
 .table-container {

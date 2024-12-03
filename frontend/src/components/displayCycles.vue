@@ -98,47 +98,49 @@ onMounted(() => {
     <h2>Ciclos (Total: {{ cycles.length }})</h2>
     <div class="table-container" v-if="cycles.length > 0 || isLoading || errorMessage">
         <div v-if="isLoading" class="loading-indicator">Cargando...</div>
-        <table v-else-if="cycles.length > 0" class="custom-table">
-            <thead>
-                <tr>
-                    <th scope="col" hidden>ID</th>
-                    <th scope="col">Índice</th>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Programa</th>
-                    <th scope="col">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(cycle, index) in cycles" :key="cycle.id">
-                    <td hidden>{{ cycle.id }}</td>
-                    <td>{{ index + 1 }}</td>
-                    <td>
-                        <div v-if="editIndex === index">
-                            <input type="text" v-model="editedName" class="form-control" />
-                            <button class="btn btn-success" @click="saveEdit(cycle.id)"
-                                :disabled="isSavingDisabled(cycle.name)">
-                                <i class="fas fa-check"></i>
+        <div class="tabble-wrapper">
+            <table v-if="!isLoading && cycles.length > 0" class="custom-table">
+                <thead>
+                    <tr>
+                        <th scope="col" hidden>ID</th>
+                        <th scope="col">Índice</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Programa</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(cycle, index) in cycles" :key="cycle.id">
+                        <td hidden>{{ cycle.id }}</td>
+                        <td>{{ index + 1 }}</td>
+                        <td>
+                            <div v-if="editIndex === index">
+                                <input type="text" v-model="editedName" class="form-control" />
+                                <button class="btn btn-success" @click="saveEdit(cycle.id)"
+                                    :disabled="isSavingDisabled(cycle.name)">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </div>
+                            <div v-else>
+                                {{ cycle.name }}
+                            </div>
+                        </td>
+                        <td>{{ cycle.program_name }}</td>
+                        <td>
+                            <button class="btn btn-primary" @click="startEdit(index, cycle.name)"
+                                v-if="editIndex !== index"><i class="fas fa-edit"></i>
                             </button>
-                        </div>
-                        <div v-else>
-                            {{ cycle.name }}
-                        </div>
-                    </td>
-                    <td>{{ cycle.program_name }}</td>
-                    <td>
-                        <button class="btn btn-primary" @click="startEdit(index, cycle.name)"
-                            v-if="editIndex !== index"><i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-primary" @click="cancelEdit()" v-else>
-                            <i class="fas fa-times"></i>
-                        </button>
-                        <button class="btn btn-danger" @click="promptDeleteCycle(cycle.id)">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                            <button class="btn btn-primary" @click="cancelEdit()" v-else>
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <button class="btn btn-danger" @click="promptDeleteCycle(cycle.id)">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="no-cycles" v-else>
         <p>No hay ciclos</p>
@@ -154,12 +156,14 @@ h2 {
     margin-bottom: 1.2rem;
 }
 
-.table-container {
+
+.table-wrapper {
     max-height: 400px;
     overflow-y: auto;
-    margin: 1%;
+    overflow-x: hidden;
     border: 1px solid #ddd;
 }
+
 
 .custom-table {
     width: 100%;

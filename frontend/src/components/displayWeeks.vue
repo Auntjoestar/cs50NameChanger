@@ -146,13 +146,11 @@ h2 {
     margin-bottom: 1.2rem;
 }
 
-.table-container {
-    margin: 1%;
-}
 
 .table-wrapper {
     max-height: 400px;
     overflow-y: auto;
+    overflow-x: hidden;
     border: 1px solid #ddd;
 }
 

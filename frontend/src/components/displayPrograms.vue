@@ -117,7 +117,7 @@ onMounted(() => {
                                 v-if="editIndex !== index">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-primary " @cick="cancelEdit()" v-else>
+                            <button class="btn btn-primary " @click="cancelEdit()" v-else>
                                 <i class="fas fa-times"></i>
                             </button>
                             <button class="btn btn-danger" @click="promptDeleteProgram(program.id)">
@@ -144,11 +144,8 @@ h2 {
     margin-bottom: 1.2rem;
 }
 
-.table-container {
-    margin: 1%;
-}
-
 .table-wrapper {
+    width: 100%;
     max-height: 400px;
     overflow-y: auto;
     border: 1px solid #ddd;
