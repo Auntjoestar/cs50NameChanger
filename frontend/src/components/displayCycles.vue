@@ -113,7 +113,7 @@ onMounted(() => {
                     <tr v-for="(cycle, index) in cycles" :key="cycle.id">
                         <td hidden>{{ cycle.id }}</td>
                         <td>{{ index + 1 }}</td>
-                        <td>
+                        <td class="name">
                             <div v-if="editIndex === index">
                                 <input type="text" v-model="editedName" class="form-control" />
                                 <button class="btn btn-success" @click="saveEdit(cycle.id)"
@@ -126,7 +126,7 @@ onMounted(() => {
                             </div>
                         </td>
                         <td>{{ cycle.program_name }}</td>
-                        <td>
+                        <td class="actions">
                             <button class="btn btn-primary" @click="startEdit(index, cycle.name)"
                                 v-if="editIndex !== index"><i class="fas fa-edit"></i>
                             </button>
@@ -205,6 +205,23 @@ h2 {
     }
 }
 
+.name {
+    input {
+        display: inline-block;
+        width: 80%;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-right: 0.5rem;
+    }
+}
+
+.actions {
+    button {
+        margin: 0 0.2rem;
+    }
+}
+
 #error-message {
     color: #dc3545;
     /* Red color for error messages */
@@ -226,5 +243,31 @@ h2 {
     height: 90%;
     color: #666;
     font-size: 1.1rem;
+}
+
+@media (max-width: 750px) {
+    .name {
+        input {
+            width: 60%;
+        }
+    }
+}
+
+@media (max-width: 773px) {
+    .actions {
+        button {
+            margin-bottom: 0.5rem;
+        }
+    }
+}
+
+
+@media (max-width: 609px) {
+    .name {
+        input {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
 }
 </style>

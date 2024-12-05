@@ -102,7 +102,7 @@ onMounted(() => {
                     <tr v-for="(week, index) in weeks" :key="index">
                         <td hidden>{{ week.id }}</td>
                         <td>{{ index + 1 }}</td>
-                        <td>
+                        <td class="name">
                             <div v-if="editIndex === index">
                                 <input type="text" v-model="editedName" class="form-control" />
                                 <button class="btn btn-success" @click="saveEdit(week.id)"
@@ -115,7 +115,7 @@ onMounted(() => {
                             </div>
                         </td>
                         <td>{{ week.cycle_name }}</td>
-                        <td>
+                        <td class="actions">
                             <button class="btn btn-primary" @click="startEdit(index, week.name)"
                                 v-if="editIndex !== index">
                                 <i class="fas fa-edit"></i>
@@ -200,6 +200,24 @@ h2 {
     background-color: #c82333;
 }
 
+.name {
+    input {
+        display: inline-block;
+        width:70%;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-right: 0.5rem;
+    }
+}
+
+.actions {
+    button {
+        margin: 0 0.2rem;
+    }
+}
+
+
 .loading-indicator {
     text-align: center;
     font-size: 1.2rem;
@@ -214,5 +232,32 @@ h2 {
     height: 90%;
     color: #666;
     font-size: 1.1rem;
+}
+
+
+@media (max-width: 750px) {
+    .name {
+        input {
+            width: 60%;
+        }
+    }
+}
+
+@media (max-width: 834px) {
+    .actions {
+        button {
+            margin-bottom: 0.5rem;
+        }
+    }
+}
+
+
+@media (max-width: 609px) {
+    .name {
+        input {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
 }
 </style>

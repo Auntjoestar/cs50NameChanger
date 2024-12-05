@@ -100,7 +100,7 @@ onMounted(() => {
                     <tr v-for="(program, index) in programs" :key="program.id">
                         <td hidden>{{ program.id }}</td>
                         <td>{{ index + 1 }}</td>
-                        <td>
+                        <td class="name">
                             <div v-if="editIndex === index">
                                 <input type="text" v-model="editedName" class="form-control" />
                                 <button @click="saveEdit(program.id)" class="btn btn-success"
@@ -112,7 +112,7 @@ onMounted(() => {
                                 {{ program.name }}
                             </div>
                         </td>
-                        <td>
+                        <td class="actions">
                             <button class="btn btn-primary" @click="startEdit(index, program.name)"
                                 v-if="editIndex !== index">
                                 <i class="fas fa-edit"></i>
@@ -195,6 +195,23 @@ h2 {
     background-color: #c82333;
 }
 
+.name {
+    input {
+        display: inline-block;
+        width:80%;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-right: 0.5rem;
+    }
+}
+
+.actions {
+    button {
+        margin: 0 0.2rem;
+    }
+}
+
 .loading-indicator {
     text-align: center;
     font-size: 1.2rem;
@@ -209,5 +226,20 @@ h2 {
     height: 90%;
     color: #666;
     font-size: 1.1rem;
+}
+
+@media (max-width: 670px) {
+.name {
+    input {
+        width: 60%;
+    }
+}
+
+
+.actions {
+    button {
+        margin-bottom: 0.5rem;
+    }
+}
 }
 </style>
