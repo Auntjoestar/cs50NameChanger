@@ -1,0 +1,30 @@
+baseURL = 'https://example.org/'
+languageCode = 'es-ni'
+title = 'CS50 Name Changer'
+theme = "hyde"
+defaultContentLanguage = "es"
+
+
+[params]
+  description = "Una aplicación de escritorio para cambiar el nombre de las fotos según el formato oficial de CS50"
+  logo = "img/logo.png"
+  icon = "icon/favicon.ico"
+
+[menu]
+
+  [[menu.main]]
+    name = "Acerca de"
+    url = "/about/"
+    weight = 2
+
+  [[menu.main]]
+    name = "Descargar"
+    url = "/downloads/"
+    weight = 3
+
+  [[menu.main]]
+    name = "Cómo usar"
+    url = "/how-to-use/"
+    weight = 4
+
+disqusShortname = "spf13"

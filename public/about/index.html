@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="es-ni" lang="es-ni">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <link href="https://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.139.3">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Acerca de &middot; CS50 Name Changer</title>
+  <meta name="description" content="" />
+
+  
+  <link type="text/css" rel="stylesheet" href="http://localhost:1313/css/print.css" media="print">
+  <link type="text/css" rel="stylesheet" href="http://localhost:1313/css/poole.css">
+  <link type="text/css" rel="stylesheet" href="http://localhost:1313/css/syntax.css">
+  <link type="text/css" rel="stylesheet" href="http://localhost:1313/css/hyde.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700">
+
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://localhost:1313/">
+  <link rel="shortcut icon" href="http://localhost:1313/icon/favicon.ico">
+
+  
+  
+</head>
+
+  <body class=" ">
+  <aside class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="http://localhost:1313/"><img src="http://localhost:1313/img/logo.png" alt="CS50 Name Changer" class="logo"></a>
+      <a href="http://localhost:1313/"><h1 class="title">CS50 Name Changer</h1></a>
+      <p class="lead">
+       Una aplicación de escritorio para cambiar el nombre de las fotos según el formato oficial de CS50 
+      </p>
+    </div>
+
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="http://localhost:1313/">Home</a> </li>
+        <li><a href="/about/"> Acerca de </a></li><li><a href="/downloads/"> Descargar </a></li><li><a href="/how-to-use/"> Cómo usar </a></li>
+      </ul>
+    </nav>
+
+    <p>&copy; 2024. All rights reserved. </p>
+  </div>
+</aside>
+
+    <main class="content container">
+    <div class="post">
+  <h1>Acerca de</h1>
+  
+  
+  
+  
+  
+  
+  <time datetime="2024-12-05T23:55:20-06:00" class="post-date">
+    Jue, Dic 5, 2024
+  </time>
+  
+  <p>Esta aplicación surge como un proyecto personal para automatizar el <strong>proceso de cambio de nombres</strong>
+a las imagenes tomadas en los cursos de <a href="https://code-fu.net.ni/">CS50 y Web50 Nicaragua</a>.</p>
+<p>Originalmente, este programa era un script de <a href="https://www.python.org/">Python</a>
+al cual se le debía pasar la ruta de una carpeta con todas las imagenes y el nombre que se repetirá
+durante todas las fotos:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">rename</span>(path, name, extension):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> root, dirs, files <span style="color:#f92672">in</span> os<span style="color:#f92672">.</span>walk(path):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> count, file <span style="color:#f92672">in</span> enumerate(files):
+</span></span><span style="display:flex;"><span>            os<span style="color:#f92672">.</span>rename(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(root, file), os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(root, <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">{</span>name<span style="color:#e6db74">}{</span>count<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span><span style="color:#e6db74">}</span><span style="color:#e6db74">.</span><span style="color:#e6db74">{</span>extension<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    path <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#39;Ingrese el path donde se encuentran los archivos: &#39;</span>)
+</span></span><span style="display:flex;"><span>    name <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#39;Ingrese cómo desea que comience el nombre de los archivos: &#39;</span>)
+</span></span><span style="display:flex;"><span>    extension <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;Ingresa la extensión de los archivos (ej: png, jpg, txt, etc): &#34;</span>)
+</span></span><span style="display:flex;"><span>    rename(path, name, extension)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div><p>Sin embargo, decidí que si quería compartir esto con otra gente era más apropiado hacerlo un programa propio,
+un poco más <em>formal</em>.</p>
+<p>Mi primera opción fue hacerlo en <a href="https://github.com/Auntjoestar/CS50-Name-Changer">winforms con C#</a>, que tenía los <strong>programas/ciclos/semanas/grupos</strong> estático. Más, pensando en la practicidad, pensé que sería apropiado agregarle una base de datos para poder agregar dinámicamente contenido.</p>
+<p>Trabajando en esto, encontré algo frustrante el <strong>manejo de interfaces en winforms</strong> y no me gustaba la cantidad de <strong>boilerplate</strong> que había. Entonces me dispuse a buscar alternativas, como tengo algo de experiencia en el <strong>desarrollo web</strong> consideré a <a href="https://www.electronjs.org/">Electron</a> como una opción, aunque <strong>no quería empaquetar una versión de chromium</strong> en una app de este estilo.</p>
+<p>Finalmente, di con <a href="https://v2.tauri.app/">Tauri</a> que me llevó a <a href="https://wails.io/">Wails</a>, entre las dos opciones preferí utilizar <strong>Wails</strong> porque se me hizo más sensato aprender algo de <a href="https://go.dev/">Go</a> para terminar estre proyecto relativamente rápido que <a href="https://www.rust-lang.org/">Rust</a> con su escala de complejidad. Este es mi pequeño aporte al mundo, mientras tanto creo que estaré aprendiendo más de <strong>Go</strong>.</p>
+
+</div>
+
+
+    </main>
+
+    
+  </body>
+</html>

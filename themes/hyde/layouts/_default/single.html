@@ -1,0 +1,21 @@
+{{ define "main" -}}
+<div class="post">
+  <h1>{{ .Title }}</h1>
+  {{ $day := .Date.Format "Mon" }}
+  {{ $month := .Date.Format "Jan" }}
+  
+  {{ $days := dict "Mon" "Lun" "Tue" "Mar" "Wed" "Mié" "Thu" "Jue" "Fri" "Vie" "Sat" "Sáb" "Sun" "Dom" }}
+  {{ $months := dict "Jan" "Ene" "Feb" "Feb" "Mar" "Mar" "Apr" "Abr" "May" "May" "Jun" "Jun" "Jul" "Jul" "Aug" "Ago" "Sep" "Sep" "Oct" "Oct" "Nov" "Nov" "Dec" "Dic" }}
+  
+  <time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}" class="post-date">
+    {{ printf "%s, %s %d, %d" (index $days $day) (index $months $month) .Date.Day .Date.Year }}
+  </time>
+  
+  {{ .Content }}
+</div>
+
+{{ if .Site.Config.Services.Disqus.Shortname -}}
+<h2>Comments</h2>
+{{ template "_internal/disqus.html" . }}
+{{- end }}
+{{- end }}
