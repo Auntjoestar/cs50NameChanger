@@ -1,0 +1,9 @@
+baseURL = 'https://example.org/'
+languageCode = 'en-us'
+title = 'CS50 Name Changer'
+theme = "hyde"
+
+[params]
+  description = "Una aplicación de escritorio para cambiar el nombre de las fotos según el formato oficial de CS50"
+  logo = "img/logo.png"
+  icon = "icon/favicon.ico"

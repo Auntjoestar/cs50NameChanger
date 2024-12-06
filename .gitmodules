@@ -1,0 +1,9 @@
+[submodule "cs50NameChanger/themes/hugo-theme-m10c"]
+	path = cs50NameChanger/themes/hugo-theme-m10c
+	url = https://github.com/vaga/hugo-theme-m10c.git
+[submodule "themes/hyde"]
+	path = themes/hyde
+	url = https://github.com/spf13/hyde.git
+[submodule "cs50NameChanger/themes/hyde"]
+	path = cs50NameChanger/themes/hyde
+	url = https://github.com/spf13/hyde.git
