@@ -2,22 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>//localhost:51019/cs50NameChanger/how-to-use/</loc>
+    <loc>//localhost:1313/cs50NameChanger/how-to-use/</loc>
     <lastmod>2024-12-06T09:06:12-06:00</lastmod>
   </url><url>
-    <loc>//localhost:51019/cs50NameChanger/</loc>
+    <loc>//localhost:1313/cs50NameChanger/</loc>
     <lastmod>2024-12-06T09:06:12-06:00</lastmod>
   </url><url>
-    <loc>//localhost:51019/cs50NameChanger/about/</loc>
+    <loc>//localhost:1313/cs50NameChanger/about/</loc>
     <lastmod>2024-12-05T23:55:20-06:00</lastmod>
   </url><url>
-    <loc>//localhost:51019/cs50NameChanger/downloads/</loc>
+    <loc>//localhost:1313/cs50NameChanger/downloads/</loc>
     <lastmod>2024-12-05T22:41:15-06:00</lastmod>
   </url><url>
-    <loc>//localhost:51019/cs50NameChanger/home/</loc>
+    <loc>//localhost:1313/cs50NameChanger/home/</loc>
   </url><url>
-    <loc>//localhost:51019/cs50NameChanger/categories/</loc>
+    <loc>//localhost:1313/cs50NameChanger/categories/</loc>
   </url><url>
-    <loc>//localhost:51019/cs50NameChanger/tags/</loc>
+    <loc>//localhost:1313/cs50NameChanger/tags/</loc>
   </url>
 </urlset>
