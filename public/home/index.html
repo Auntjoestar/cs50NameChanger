@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="es-ni" lang="es-ni">
+<head><script src="/cs50NameChanger/livereload.js?mindelay=10&amp;v=2&amp;port=51019&amp;path=cs50NameChanger/livereload" data-no-instant defer></script>
+  <link href="https://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.139.3">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Bienvenido &middot; CS50 Name Changer</title>
+  <meta name="description" content="" />
+
+  
+  <link type="text/css" rel="stylesheet" href="//localhost:51019/cs50NameChanger/css/print.css" media="print">
+  <link type="text/css" rel="stylesheet" href="//localhost:51019/cs50NameChanger/css/poole.css">
+  <link type="text/css" rel="stylesheet" href="//localhost:51019/cs50NameChanger/css/syntax.css">
+  <link type="text/css" rel="stylesheet" href="//localhost:51019/cs50NameChanger/css/hyde.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700">
+
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="//localhost:51019/cs50NameChanger/">
+  <link rel="shortcut icon" href="//localhost:51019/cs50NameChanger/icon/favicon.ico">
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  
+  
+  
+  <script>
+    (function() {
+      emailjs.init("Sb8xetJPPzpvoeByH"); 
+    })();
+  </script>
+
+  
+  
+</head>
+
+  <body class=" ">
+  <aside class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="//localhost:51019/cs50NameChanger/"><img src="//localhost:51019/cs50NameChanger/img/logo.png" alt="CS50 Name Changer" class="logo"></a>
+      <a href="//localhost:51019/cs50NameChanger/"><h1 class="title">CS50 Name Changer</h1></a>
+      <p class="lead">
+       Una aplicación de escritorio para cambiar el nombre de las fotos según el formato oficial de CS50 
+      </p>
+    </div>
+
+    <nav>
+      <ul class="sidebar-nav">
+        <li><a href="//localhost:51019/cs50NameChanger/">Home</a> </li>
+        <li><a href="/cs50NameChanger/about/"> Acerca de </a></li><li><a href="/cs50NameChanger/downloads/"> Descargar </a></li><li><a href="/cs50NameChanger/how-to-use/"> Cómo usar </a></li>
+      </ul>
+    </nav>
+
+    <p>© 2024 - CS50 Name Changer</p>
+  </div>
+</aside>
+
+    <main class="content container">
+    <div class="post">
+  <h1>Bienvenido</h1>
+  
+  
+  
+  
+  
+  
+  <time datetime="0001-01-01T00:00:00Z" class="post-date">
+    Lun, Ene 1, 1
+  </time>
+  
+  <h2 id="bienvenido">Bienvenido</h2>
+<p>Esta es la página de la aplicación CS50 Name Changer, haz click <a href="./downloads">aquí</a> para acceder al link de descarga.</p>
+<hr>
+<h2 id="envía-tu-reseña">Envía tu reseña</h2>
+<p>¡Nos encantaría conocer tu opinión sobre la aplicación! Por favor, completa el formulario a continuación para compartir tu experiencia:</p>
+<form id="review-form" onsubmit="sendEmail(event)">
+<p><label for="name">Tu Nombre:</label>
+<input type="text" id="name" name="name" required class="form-control"></p>
+<p><label for="email">Tu Email:</label>
+<input type="email" id="email" name="email" required class="form-control"></p>
+<p><label for="review">Tu Reseña:</label><textarea id="review" name="review" rows="5" required class="text-area"></textarea></p>
+  <div class="g-recaptcha" data-sitekey="6LcppJQqAAAAABQiUBLKHiszdQD_ajG2qVt5T3F7"></div>
+<p><button type="submit" class="btn btn-primary">Enviar Reseña</button></p>
+</form>
+<script>
+  function sendEmail(event) {
+    event.preventDefault(); 
+
+    const form = document.getElementById('review-form');
+    const formData = {
+      name: form.name.value,
+      email: form.email.value,
+      review: form.review.value,
+    };
+
+    emailjs
+      .send('service_npss3g4', 'template_ivd82zo', formData)
+      .then(() => {
+        alert('¡Reseña enviada con éxito! Gracias por tu colaboración.');
+        form.reset(); // Limpia el formulario después de enviarlo
+      })
+      .catch((error) => {
+        console.error('Error al enviar el correo:', error);
+        alert('Ocurrió un error al enviar tu reseña. Por favor, inténtalo de nuevo.');
+      });
+  }
+</script>
+</div>
+
+
+    </main>
+
+    
+  </body>
+</html>

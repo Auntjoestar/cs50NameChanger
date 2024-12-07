@@ -1,14 +1,21 @@
-baseURL = 'https://example.org/'
+baseURL = 'auntjoestar.github.io/cs50NameChanger/'
 languageCode = 'es-ni'
 title = 'CS50 Name Changer'
 theme = "hyde"
 defaultContentLanguage = "es"
 
 
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
+
 [params]
   description = "Una aplicación de escritorio para cambiar el nombre de las fotos según el formato oficial de CS50"
   logo = "img/logo.png"
   icon = "icon/favicon.ico"
+  copyright = "© 2024 - CS50 Name Changer"
 
 [menu]
 
@@ -27,4 +34,3 @@ defaultContentLanguage = "es"
     url = "/how-to-use/"
     weight = 4
 
-disqusShortname = "spf13"

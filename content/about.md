@@ -1,7 +1,8 @@
 +++
 date = '2024-12-05T23:55:20-06:00'
-draft = true
+draft = false
 title = 'Acerca de'
+hidden = true
 +++
 
 Esta aplicación surge como un proyecto personal para automatizar el **proceso de cambio de nombres**

@@ -26,6 +26,17 @@
   <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ .Site.BaseURL }}{{ .Site.Params.appleIcon }}">
   <link rel="shortcut icon" href="{{ .Site.BaseURL }}{{ .Site.Params.icon }}">
 
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  
+  
+  <!-- For review -->
+  <script>
+    (function() {
+      emailjs.init("Sb8xetJPPzpvoeByH"); 
+    })();
+  </script>
+
   <!-- RSS etc -->
   {{ range .AlternativeOutputFormats -}}
     {{ printf `<link href="%s" rel="%s" type="%s" title="%s" />` .Permalink .Rel .MediaType.Type $.Site.Title | safeHTML }}

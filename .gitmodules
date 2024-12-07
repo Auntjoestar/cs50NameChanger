@@ -7,3 +7,6 @@
 [submodule "cs50NameChanger/themes/hyde"]
 	path = cs50NameChanger/themes/hyde
 	url = https://github.com/spf13/hyde.git
+[submodule "connie/themes/poison"]
+	path = connie/themes/poison
+	url = https://github.com/lukeorth/poison
