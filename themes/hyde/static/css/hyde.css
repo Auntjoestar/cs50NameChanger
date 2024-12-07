@@ -110,6 +110,12 @@ html {
   box-shadow: 0 0 0 0.125rem rgba(51,122,183,.5);
 }
 
+.btn:disabled {
+  color: #fff;
+  background-color: #333;
+  border-color: #333;
+}
+
 #review-form {
   display: flex;
   flex-direction: column;

@@ -25,7 +25,7 @@ Esta es la página de la aplicación CS50 Name Changer, haz click [aquí](./down
   <!-- reCAPTCHA -->
   <div class="g-recaptcha" data-sitekey="6LcppJQqAAAAABQiUBLKHiszdQD_ajG2qVt5T3F7"></div>
 
-  <button type="submit" class="btn btn-primary">Enviar Reseña</button>
+  <button type="submit" class="btn btn-primary" id="submit-button">Enviar Reseña</button>
 </form>
 
 <script>
@@ -35,10 +35,16 @@ Esta es la página de la aplicación CS50 Name Changer, haz click [aquí](./down
     const result = document.getElementById("result");
 
     const recaptchaResponse = grecaptcha.getResponse();
+
+    const submitButton = document.getElementById("submit-button");
+
+    submitButton.disabled = true;
+
     if (!recaptchaResponse) {
       result.innerText = "Por favor, completa el CAPTCHA antes de enviar el formulario.";
       result.style.color = "#CC0000";
       result.hidden = false;
+      submitButton.disabled = false;
       result.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
@@ -60,6 +66,7 @@ Esta es la página de la aplicación CS50 Name Changer, haz click [aquí](./down
         result.hidden = false;
         result.scrollIntoView({ behavior: 'smooth', block: 'start' });
         grecaptcha.reset(); 
+        submitButton.disabled = false;
         form.reset(); 
       })
       .catch((error) => {
@@ -67,6 +74,7 @@ Esta es la página de la aplicación CS50 Name Changer, haz click [aquí](./down
         result.style.color = "#CC0000";
         result.hidden = false;
         result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        submitButton.disabled = false;
       });
   }
 </script>

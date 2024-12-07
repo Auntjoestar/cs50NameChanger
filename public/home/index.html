@@ -88,7 +88,7 @@
   <textarea id="review" name="review" rows="5" required class="text-area"></textarea>
   <!-- reCAPTCHA -->
   <div class="g-recaptcha" data-sitekey="6LcppJQqAAAAABQiUBLKHiszdQD_ajG2qVt5T3F7"></div>
-<p><button type="submit" class="btn btn-primary">Enviar Reseña</button></p>
+<p><button type="submit" class="btn btn-primary" id="submit-button">Enviar Reseña</button></p>
 </form>
 <script>
   function sendEmail(e) {
@@ -97,10 +97,16 @@
     const result = document.getElementById("result");
 
     const recaptchaResponse = grecaptcha.getResponse();
+
+    const submitButton = document.getElementById("submit-button");
+
+    submitButton.disabled = true;
+
     if (!recaptchaResponse) {
       result.innerText = "Por favor, completa el CAPTCHA antes de enviar el formulario.";
       result.style.color = "#CC0000";
       result.hidden = false;
+      submitButton.disabled = false;
       result.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
@@ -122,6 +128,7 @@
         result.hidden = false;
         result.scrollIntoView({ behavior: 'smooth', block: 'start' });
         grecaptcha.reset(); 
+        submitButton.disabled = false;
         form.reset(); 
       })
       .catch((error) => {
@@ -129,6 +136,7 @@
         result.style.color = "#CC0000";
         result.hidden = false;
         result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        submitButton.disabled = false;
       });
   }
 </script>
