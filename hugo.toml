@@ -3,6 +3,8 @@ languageCode = 'es-ni'
 title = 'CS50 Name Changer'
 theme = "hyde"
 defaultContentLanguage = "es"
+canonicalURL = "https://auntjoestar.github.io/cs50NameChanger/"
+keywords = ["CS50", "Name Changer", "CS50 Name Changer", "CS50x", "Web50"]
 
 
 [markup]
