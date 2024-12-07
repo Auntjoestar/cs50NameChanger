@@ -229,7 +229,7 @@ Project Link: [https://github.com/auntjoestar/cs50NameChanger](https://github.co
 [issues-shield]: https://img.shields.io/github/issues/auntjoestar/cs50NameChanger.svg?style=for-the-badge
 [issues-url]: https://github.com/auntjoestar/cs50NameChanger/issues
 [license-shield]: https://img.shields.io/github/license/auntjoestar/cs50NameChanger.svg?style=for-the-badge
-[license-url]: https://github.com/auntjoestar/cs50NameChanger/blob/master/LICENSE.md
+[license-url]: https://github.com/auntjoestar/cs50NameChanger/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [product-screenshot]: images/screenshot.png
 [Wails]: https://img.shields.io/badge/Wails-DF0000?style=for-the-badge&logo=wails&logoColor=white
