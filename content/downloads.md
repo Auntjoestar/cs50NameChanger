@@ -19,4 +19,4 @@ Versión portable que se puede abrir desde cualquier dirección. Ten en cuenta q
 
 [cs50NameChanger-amd64-installer.exe](cs50NameChanger-amd64-installer.exe) 
 
-Versión portable que se puede abrir desde cualquier dirección. Ten en cuenta que el programa creará la base de datos y carpetas con las fotos, por lo cual se recomienda crearle su carpeta dedicada.
+Versión instalable que se descargará al nivel de usuario, este se descargará junto a sus aplicaciones normales con su carpeta dedicada.
